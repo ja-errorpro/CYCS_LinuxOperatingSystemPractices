@@ -1,0 +1,608 @@
+----------------------------------------------------------------------------------------
+
+# Ubuntu-2204 came with Python 3.10. However, we want Python 3.11, just want to be on the safe side.
+
+# With 'sudo add-apt-repository ppa:deadsnakes/ppa', 'sudo apt install python3.11' will install "normal python3.11" (e.g., 3.11.9)
+
+# Without 'deadsnakes', 'sudo apt install python3.11' will install Python 3.11.0rc1 (the first release candidate for Python 3.11)).
+
+> sudo add-apt-repository ppa:deadsnakes/ppa
+> sudo apt update
+
+> sudo apt install python3.11
+
+> python3.11 --version
+Python 3.11.13
+
+> whereis python3
+python3: /usr/bin/python3 /usr/lib/python3 /etc/python3 /usr/share/python3 
+         /usr/share/man/man1/python3.1.gz
+> whereis python3.10
+python3.10: /usr/bin/python3.10 /usr/lib/python3.10 /etc/python3.10 
+            /usr/local/lib/python3.10 
+            /usr/include/python3.10 
+            /usr/share/man/man1/python3.10.1.gz
+> whereis python3.11
+python3.11: /usr/bin/python3.11 /usr/lib/python3.11 /etc/python3.11 
+            /usr/local/lib/python3.11 /usr/share/man/man1/python3.11.1.gz
+
+> ls -l /usr/bin/ | grep python
+lrwxrwxrwx 1 root root      24  八  15 22:32 pdb3.10 -> ../lib/python3.10/pdb.py
+lrwxrwxrwx 1 root root      24  六   4 16:57 pdb3.11 -> ../lib/python3.11/pdb.py
+lrwxrwxrwx 1 root root      31  八  12 14:06 py3versions -> ../share/python3/py3versions.py
+lrwxrwxrwx 1 root root      10  八  12 14:06 python3 -> python3.10
+-rwxr-xr-x 1 root root 5937768  八  15 22:32 python3.10
+lrwxrwxrwx 1 root root      34  八  15 22:32 python3.10-config -> x86_64-linux-gnu-python3.10-config
+-rwxr-xr-x 1 root root 6727416  六   4 16:57 python3.11
+lrwxrwxrwx 1 root root      17  八   8  2024 python3-config -> python3.10-config
+-rwxr-xr-x 1 root root     960  一  25  2023 python3-futurize
+-rwxr-xr-x 1 root root     964  一  25  2023 python3-pasteurize
+-rwxr-xr-x 1 root root    3123  八  15 22:32 x86_64-linux-gnu-python3.10-config
+lrwxrwxrwx 1 root root      34  八   8  2024 x86_64-linux-gnu-python3-config -> x86_64-linux-gnu-python3.10-config
+
+# i.e., there is no 'python3', only 'python3.10' and 'python3.11', and 'python3' IS 'python3.10'
+
+# Let us do the following, just want to keep it for the record.
+
+# Next, we check what the value of sys.path is (for both python3.10 and python3.11), just for
+# the record
+
+> python3.10
+...
+>>> import sys
+>>> sys.path
+['', '/usr/lib/python310.zip', '/usr/lib/python3.10', '/usr/lib/python3.10/lib-dynload', '/usr/local/lib/python3.10/dist-packages', '/usr/lib/python3/dist-packages']
+>>> exit()
+
+> python3.11
+...
+>>> import sys
+>>> sys.path
+['', '/usr/lib/python311.zip', '/usr/lib/python3.11', '/usr/lib/python3.11/lib-dynload', '/usr/local/lib/python3.11/dist-packages', '/usr/lib/python3/dist-packages']
+>>> exit()
+
+# Now we move on to 'pip' - we will need to use pip to download Python packages.
+
+> whereis pip
+pip:                     # this means not found
+
+> whereis pip3
+pip3:                    # not found either
+
+> sudo apt install python3-pip
+
+> whereis pip
+pip: /usr/bin/pip /usr/share/man/man1/pip.1.gz
+
+> ls -al /usr/bin | grep pip
+...
+-rwxr-xr-x  1 root root         221  六  26 20:07 pip       # unzipped from a .zip?
+-rwxr-xr-x  1 root root         221  六  26 20:07 pip3
+-rwxr-xr-x  1 root root         221  六  26 20:07 pip3.10
+...
+
+> pip --version
+pip 22.0.2 from /usr/lib/python3/dist-packages/pip (python 3.10)
+> pip3 --version
+pip 22.0.2 from /usr/lib/python3/dist-packages/pip (python 3.10)
+> pip3.10 --version
+pip 22.0.2 from /usr/lib/python3/dist-packages/pip (python 3.10)
+
+# i.e., all three 'pip's are in fact the same one
+
+> ls -l /usr/lib/python3/dist-packages/ | grep pip
+drwxr-xr-x  5 root root   4096  九   5 15:49 pip      # this means 'pip' was installed just now
+drwxr-xr-x  2 root root   4096  九   5 15:49 pip-22.0.2.dist-info
+
+> date
+公曆 20廿五年 九月 五日 週五 十八時51分廿秒
+
+> pip3.10 install --upgrade pip
+
+> pip --version
+pip 25.2 from /home/userName/.local/lib/python3.10/site-packages/pip (python 3.10)
+> pip3 --version
+pip 25.2 from /home/userName/.local/lib/python3.10/site-packages/pip (python 3.10)
+> pip3.10 --version
+pip 25.2 from /home/userName/.local/lib/python3.10/site-packages/pip (python 3.10)
+
+> ls -al ~ | grep local     # just to show that there is a .local under <user home>
+drwx------  3 userName userName 4096  八  12 14:26 .local
+
+> ls -al ~/.local           # just to show what's under ~/.local (only 'share')
+total 12
+drwx------  3 userName userName 4096  八  12 14:26 .
+drwxr-x--- 16 userName userName 4096  九   5 19:14 ..
+drwx------ 14 userName userName 4096  九   5 15:12 share
+
+# When we 'pip3 install package-name', the downloaded package is placed (installed) under 
+# ~/.local/lib/python3.10/site-packages/ (with the corresponding executable under ~/.local/bin/)
+
+> pip3 install virtualenv
+...
+WARNING: The script virtualenv is installed in '/home/userName/.local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+Successfully installed distlib-0.4.0 filelock-3.19.1 platformdirs-4.4.0 
+                       typing-extensions-4.15.0 virtualenv-20.34.0
+
+> ls -al ~/.local          # now there are 'bin' and 'lib' under '.local'
+total 20
+drwx------  5 userName userName 4096  九   5 21:40 .
+drwxr-x--- 16 userName userName 4096  九   5 19:14 ..
+drwxrwxr-x  2 userName userName 4096  九   5 21:43 bin
+drwxrwxr-x  3 userName userName 4096  九   5 21:40 lib
+drwx------ 14 userName userName 4096  九   5 15:12 share
+
+> ls -al ~/.local/bin      
+total 24
+drwxrwxr-x 2 userName userName 4096  九   5 21:43 .
+drwx------ 5 userName userName 4096  九   5 21:40 ..
+-rwxrwxr-x 1 userName userName  221  九   5 21:40 pip
+-rwxrwxr-x 1 userName userName  221  九   5 21:40 pip3
+-rwxrwxr-x 1 userName userName  221  九   5 21:40 pip3.10
+-rwxrwxr-x 1 userName userName  211  九   5 21:43 virtualenv
+
+> ~/.local/bin/pip --version # just want to see if this is a copy
+pip 25.2 from /home/userName/.local/lib/python3.10/site-packages/pip (python 3.10)
+
+> /usr/bin/pip --version     # just to make sure the original is still there
+pip 25.2 from /home/userName/.local/lib/python3.10/site-packages/pip (python 3.10)
+
+# let us now see where the newly 'pip'ed (installed) 'virtualenv' package is placed
+
+> ls ~/.local/lib
+python3.10
+
+> ls ~/.local/lib/python3.10/
+site-packages
+
+> ls ~/.local/lib/python3.10/site-packages/
+distlib                    pip                           __pycache__                         virtualenv-20.34.0.dist-info
+distlib-0.4.0.dist-info    pip-25.2.dist-info            typing_extensions-4.15.0.dist-info
+filelock                   platformdirs                  typing_extensions.py
+filelock-3.19.1.dist-info  platformdirs-4.4.0.dist-info  virtualenv
+
+> ls ~/.local/lib/python3.10/site-packages/virtualenv     # the 'virtualenv' package
+activation  cache   create     info.py      __main__.py  report.py  seed  version.py
+app_data    config  discovery  __init__.py  __pycache__  run        util
+
+# pip has managed to change the value of the environment variable 'PATH'.
+# This makes it possible for us to call executables under ~/.local/bin
+
+> whereis virtualenv
+virtualenv: /home/userName/.local/bin/virtualenv      # this means we can execute 'virtualenv'
+
+# pip has also managed to change the value of sys.path IF the python we run is python3.10
+
+> python3.10
+...
+>>> import sys
+>>> sys.path
+['', '/usr/lib/python310.zip', '/usr/lib/python3.10', '/usr/lib/python3.10/lib-dynload', '/home/userName/.local/lib/python3.10/site-packages', '/usr/local/lib/python3.10/dist-packages', '/usr/lib/python3/dist-packages']
+>>> import filelock     # a module under /home/userName/.local/lib/python3.10/site-packages
+>>> exit()
+
+# But this only works for python3.10. If the Python we run is python3.11, the value of sys.path 
+# remains the same as before. What this means in turn is that IF we do not change the current 
+# setup, we will not be able to import any package we have 'pip'ed WHEN we run python3.11.
+
+> python3.11
+...
+>>> import sys
+>>> sys.path
+['', '/usr/lib/python311.zip', '/usr/lib/python3.11', '/usr/lib/python3.11/lib-dynload', '/usr/local/lib/python3.11/dist-packages', '/usr/lib/python3/dist-packages']
+>>> import filelock
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ModuleNotFoundError: No module named 'filelock'
+>>> exit()
+
+# We want to run python3.11 instead of python3.10. Therefore, we must put
+# 'export PYTHONPATH=~/bin:~/.local/lib/python3.10/site-packages' 
+# in ~/.bashrc   
+
+> export PYTHONPATH=~/.local/lib/python3.10/site-packages   # since we do not have it in .bashrc (yet)
+
+> python3.11
+...
+>>> import sys
+>>> sys.path
+['', '/home/userName/.local/lib/python3.10/site-packages', '/usr/lib/python311.zip', '/usr/lib/python3.11', '/usr/lib/python3.11/lib-dynload', '/usr/local/lib/python3.11/dist-packages', '/usr/lib/python3/dist-packages']
+>>> import filelock
+>>> exit()
+
+> nano ~/.bashrc    # add the following line at the end and then save and exit (notice '~/bin:')
+
+export PYTHONPATH=~/bin:~/.local/lib/python3.10/site-packages
+
+# if you prefer, you can log out and log in again, and then check python3.11 again.
+# or, you can just continue.
+
+# Next, we turn our attention to 'virtualenv', the one and only package we just 'pip'ed earlier.
+
+# 'virtualenv' is a script (this means we can 'nano' it)
+ 
+# If we do not change 'python3' specified at the start of 'virtualenv' to 'python3.11', the resulting virtual environment (i.e., ~/Python_Practice/VirEnv1/bin/) will only have python3 (= python3.10) in it, and there will be no python3.11 in ~/Python_Practice/VirEnv1/bin/.
+
+# Therefore, ...
+
+> nano ~/.local/bin/virtualenv   # and change 'python3' (first line) to 'python3.11'
+
+# (We have defined the environment variable PYTHONPATH. So, 'python3.11' is able to find basic
+#  modules in ~/.local/lib/python3.10/site-packages.)
+
+> cd ~
+
+> mkdir Python_Practice
+
+> cd Python_Practice
+
+> virtualenv VirEnv1       # theoretically, we may also have VirEnv2, VirEnv3, ... in the future
+
+> source VirEnv1/bin/activate
+
+(VirEnv1) ... >        # this new prompt means we are now in a "virtual environment" named 'VirEnv1'
+
+# This "virtual environment" is essentially the same as the original Linux environment.
+# 'VirEnv1/bin/activate' just add some tricks to the original Linux environment so that
+# any python related commands will be closely related to a "controlled directory".
+
+(VirEnv1) Ubuntu-2204 : /home/userName/Python_Practice
+userName > ls
+VirEnv1                # this is what I called "a controlled directory"
+
+(VirEnv1) > ls -al VirEnv1/bin/ # when you call 'python' or 'python3', you will be calling
+total 48                        # 'python3.11' (IF you are "in" this (virtual) environment)
+drwxrwxr-x 2 userName userName 4096  九   6 10:01 .
+drwxrwxr-x 4 userName userName 4096  九   6 10:01 ..
+-rw-rw-r-- 1 userName userName 2919  九   6 10:01 activate
+-rw-rw-r-- 1 userName userName 2074  九   6 10:01 activate.csh
+-rw-rw-r-- 1 userName userName 3762  九   6 10:01 activate.fish
+-rw-rw-r-- 1 userName userName 2855  九   6 10:01 activate.nu
+-rw-rw-r-- 1 userName userName 2657  九   6 10:01 activate.ps1
+-rw-rw-r-- 1 userName userName 1287  九   6 10:01 activate_this.py
+-rwxrwxr-x 1 userName userName  254  九   6 10:01 pip
+-rwxrwxr-x 1 userName userName  254  九   6 10:01 pip3
+-rwxrwxr-x 1 userName userName  254  九   6 10:01 pip-3.11
+-rwxrwxr-x 1 userName userName  254  九   6 10:01 pip3.11
+lrwxrwxrwx 1 userName userName   19  九   6 10:01 python -> /usr/bin/python3.11
+lrwxrwxrwx 1 userName userName    6  九   6 10:01 python3 -> python
+lrwxrwxrwx 1 userName userName    6  九   6 10:01 python3.11 -> python
+
+(VirEnv1) > echo $PATH          # this is why
+/home/userName/Python_Practice/VirEnv1/bin:/home/userName/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/userName/bin
+
+(VirEnv1) > pip --version
+pip 25.2 from /home/userName/.local/lib/python3.10/site-packages/pip (python 3.11)
+
+(VirEnv1) > ls -al VirEnv1/lib/python3.11/site-packages/    # where all 'pip'ed packages will be
+total 48
+drwxrwxr-x 8 userName userName 4096  九   6 10:01 .
+drwxrwxr-x 3 userName userName 4096  九   6 10:01 ..
+drwxrwxr-x 2 userName userName 4096  九   6 10:01 _distutils_hack
+-rw-rw-r-- 1 userName userName  151  九   6 10:01 distutils-precedence.pth
+drwxrwxr-x 4 userName userName 4096  九   6 10:01 pip
+drwxrwxr-x 3 userName userName 4096  九   6 10:01 pip-25.2.dist-info
+-rw-rw-r-- 1 userName userName    0  九   6 10:01 pip-25.2.virtualenv
+drwxrwxr-x 3 userName userName 4096  九   6 10:01 pkg_resources
+drwxrwxr-x 8 userName userName 4096  九   6 10:01 setuptools
+drwxrwxr-x 3 userName userName 4096  九   6 10:01 setuptools-80.9.0.dist-info
+-rw-rw-r-- 1 userName userName    0  九   6 10:01 setuptools-80.9.0.virtualenv
+-rw-rw-r-- 1 userName userName   18  九   6 10:01 _virtualenv.pth
+-rw-rw-r-- 1 userName userName 4443  九   6 10:01 _virtualenv.py
+
+(VirEnv1) > nano ~/.bashrc    # add the following line at the end, save, and exit
+
+alias VirEnv1Activate='source ~/Python_Practice/VirEnv1/bin/activate ; echo ; echo Use \"deactivate\" to quit. ; echo'
+
+# In the future, when you login, just do >>Vir[TAB][ENTER]<<. This will set up the virtual env.
+
+# To leave a virtual env., just do >>deactivate<<
+
+(VirEnv1) > pip install --upgrade pip     # just want to be on the safe side ; no harm whatsoever
+
+(VirEnv1) > pip install pandas
+
+(VirEnv1) > pip install matplotlib        # this will include the installation of numpy
+
+# A note on the side :
+#   The installation of matplotlib includes the installation of numpy 2.3.2.
+#   But if we 'pip install numpy' directly in the normal env. (w/o VirEnv1), it will be numpy 2.2.6
+#   "normal installation" (w/o VirEnv1) will put pkgs in ~/.local//lib/python3.10/site-packages
+#   VirEnv1-installations will put pkgs in ~/Python_Practice/VirEnv1/lib/python3.11/site-packages
+
+(VirEnv1) > echo $PYTHONPATH    # set when the login shell executed ~/.bashrc
+/home/userName/bin:/home/userName/.local/lib/python3.10/site-packages 
+
+(VirEnv1) > python              # this is why the value of sys.path is as follows
+Python 3.11.13 ...
+>>> import sys
+>>> sys.path
+['', '/home/userName/bin', '/home/userName/.local/lib/python3.10/site-packages', '/usr/lib/python311.zip', '/usr/lib/python3.11', '/usr/lib/python3.11/lib-dynload', '/home/userName/Python_Practice/VirEnv1/lib/python3.11/site-packages']
+>>> exit()
+
+# Strictly speaking, '/home/userName/.local/lib/python3.10/site-packages' should not be in sys.path.
+# If it has to be in sys.path, at least it should appear BEHIND
+# '/home/userName/Python_Practice/VirEnv1/lib/python3.11/site-packages',
+# because the order of these paths determines how python3.11 searches for packages.
+
+# To solve this (ordering) problem, let us modify ~/Python_Practice/VirEnv1/bin/activate.
+
+(VirEnv1) > cd ~/Python_Practice/VirEnv1/bin/
+
+(VirEnv1) > cp activate activate-original
+
+(VirEnv1) > nano activate
+
+(a) At the end of activate()   # The line numbers are for your reference. They are not part of code.
+
+The original code is :
+
+     48     unset VIRTUAL_ENV
+     49     unset VIRTUAL_ENV_PROMPT
+     50     if [ ! "${1-}" = "nondestructive" ] ; then
+     51     # Self destruct!
+     52         unset -f deactivate
+     53     fi
+     54 }
+     55 
+
+Beneath Line 53 ('fi') and above Line 54 ('}'), add the following code to restore old PYTHONPATH value
+(Just take the numbers and the spaces preceding them away. Each line should have four leading spaces.)
+
+     54     
+     55     # this section by userName
+     56     if ! [ -z "${_OLD_PYTHONPATH+_}" ] ; then
+     57         PYTHONPATH="$_OLD_PYTHONPATH"
+     58         export PYTHONPATH
+     59         unset _OLD_PYTHONPATH
+     60     fi
+     61
+
+After adding the above 8 lines of code, the original Line 54 ('}') becomes Line 62, and we have
+just added a section of code at the end of activate().  
+
+(b) Right after the original code for 『replacing PATH and saving the original PATH-value』
+
+The original code is : # Originally Lines 65-73 ; Now they are Lines 73-81 (due to the new 8 lines)
+
+     73 _OLD_VIRTUAL_PATH="$PATH"
+     74 PATH="$VIRTUAL_ENV/"bin":$PATH"
+     75 export PATH
+     76 
+     77 if [ "x"'' != x ] ; then
+     78     VIRTUAL_ENV_PROMPT=''
+     79 else
+     80     VIRTUAL_ENV_PROMPT=$(basename "$VIRTUAL_ENV")
+     81 fi
+
+Beneath Line 76 (the empty line ; Line 75 is 'export PATH') and above 
+Line 77 ('if [ "x"'' != x ] ; then'), add the following code to save the original PYTHONPATH 
+value and also to set the new PYTHONPATH value. (No leading spaces this time.)
+
+     77 # these three lines by userName
+     78 _OLD_PYTHONPATH="$PYTHONPATH"
+     79 PYTHONPATH="${HOME}/bin"
+     80 export PYTHONPATH
+     81 
+
+After adding the above five lines of code, we get the following.
+
+     73 _OLD_VIRTUAL_PATH="$PATH"
+     74 PATH="$VIRTUAL_ENV/"bin":$PATH"
+     75 export PATH
+     76 
+     77 # these three lines by userName
+     78 _OLD_PYTHONPATH="$PYTHONPATH"
+     79 PYTHONPATH="${HOME}/bin"
+     80 export PYTHONPATH
+     81 
+     82 if [ "x"'' != x ] ; then
+     83     VIRTUAL_ENV_PROMPT=''
+     84 else
+     85     VIRTUAL_ENV_PROMPT=$(basename "$VIRTUAL_ENV")
+     86 fi
+
+# Save and exit nano
+
+(VirEnv1) > less -N activate    # to verify that the above is correct
+
+# Let us now check whether the above arrangement works
+
+(VirEnv1) > deactivate
+
+> python3.11
+>>> import sys
+>>> sys.path
+['', '/home/userName/bin', '/home/userName/.local/lib/python3.10/site-packages', '/usr/lib/python311.zip', '/usr/lib/python3.11', '/usr/lib/python3.11/lib-dynload', '/usr/local/lib/python3.11/dist-packages', '/usr/lib/python3/dist-packages']
+>>> exit()
+
+> VirEnv1Activate 
+
+(VirEnv1) > python3.11
+>>> import sys
+>>> sys.path
+['', '/home/userName/bin', '/usr/lib/python311.zip', '/usr/lib/python3.11', '/usr/lib/python3.11/lib-dynload', '/home/userName/Python_Practice/VirEnv1/lib/python3.11/site-packages']
+>>> exit()
+
+(VirEnv1) > deactivate
+
+> python3.11
+>>> import sys
+>>> sys.path
+['', '/home/userName/bin', '/home/userName/.local/lib/python3.10/site-packages', '/usr/lib/python311.zip', '/usr/lib/python3.11', '/usr/lib/python3.11/lib-dynload', '/usr/local/lib/python3.11/dist-packages', '/usr/lib/python3/dist-packages']
+>>> exit()
+
+> VirEnv1Activate 
+
+(VirEnv1) > python3.11
+>>> import sys
+>>> sys.path
+['', '/home/userName/bin', '/usr/lib/python311.zip', '/usr/lib/python3.11', '/usr/lib/python3.11/lib-dynload', '/home/userName/Python_Practice/VirEnv1/lib/python3.11/site-packages']
+>>> exit()
+
+# Done with the exploration of virtualenv.  Back to the installation of new pkgs (in VE1)
+
+(VirEnv1) > pip install tensorflow
+...
+Requirement already satisfied: numpy>=1.26.0 in ./Python_Practice/VirEnv1/lib/python3.11/site-packages (from tensorflow) (2.3.2)
+...
+
+(VirEnv1) > pip install ipywidgets
+
+# now, if you look at ~/Python_Practice/VirEnv1/lib/python3.11/site-packages/,
+# you will find that it contains quite a few packages.
+
+(VirEnv1) > ls ~/Python_Practice/VirEnv1/lib/python3.11/site-packages/
+
+# a matter of where we should work (what should be our working directory when we work with Python)
+
+(VirEnv1) > cd ~/Python_Practice
+
+(VirEnv1) > mkdir VirEnv1Projs
+
+(VirEnv1) > cd VirEnv1Projs
+
+(VirEnv1) > export VP1=~/Python_Practice/VirEnv1Projs
+
+(VirEnv1) > nano ~/.bashrc  # and put the following line at the end
+
+export VP1=${HOME}/Python_Practice/VirEnv1Projs
+
+# save and exit nano
+
+# From now on, when we work with Python in the "normal" environment, we put things under
+# ~/Python_Practice ;
+# if we work with Python in a virtual environment such as VirEnv1, we put things under
+# ~/Python_Practice/VirEnv1Projs.
+# To cd to ~/Python_Practice/VirEnv1Projs, just do >>cd $VP1<<.
+
+(VirEnv1) > nano ~/.bashrc  # and put the following at the end
+
+echo '
+
+                A Ubuntu-2204 Machine
+
+      --------> DO : VirEnv1Activate <--------
+
+'
+
+# save and exit nano
+
+(VirEnv1) > exit
+
+Log in again (or open a new Terminal)
+
+> Vi[TAB][ENTER]
+
+(VirEnv1) > 
+
+# Onto Django
+
+(VirEnv1) > cd $VP1       # Working directory : ~/Python_Practice/VirEnv1Projs/
+
+(VirEnv1) > mkdir Django
+
+(VirEnv1) > cd Django     # Working directory : ~/Python_Practice/VirEnv1Projs/Django/
+
+# Make sure you are in a virtual environment (e.g., VirEnv1)
+
+(VirEnv1) > pip3.11 install django
+
+(VirEnv1) > python -m django --version
+5.2.6
+
+(VirEnv1) > django-admin startproject Main # This 'Main' should actually be 'ClassProj' ; but we want 'Main' sub-dir
+
+(VirEnv1) > ls -Rl Main    # WD : ~/Python_Practice/VirEnv1Projs/Django/
+Main:
+total 8
+drwxrwxr-x 2 userName userName 4096  九   6 15:31 Main
+-rwxrwxr-x 1 userName userName  660  九   6 15:31 manage.py
+
+Main/Main:
+total 16
+-rw-rw-r-- 1 userName userName  385  九   6 15:31 asgi.py
+-rw-rw-r-- 1 userName userName    0  九   6 15:31 __init__.py
+-rw-rw-r-- 1 userName userName 3155  九   6 15:31 settings.py
+-rw-rw-r-- 1 userName userName  760  九   6 15:31 urls.py
+-rw-rw-r-- 1 userName userName  385  九   6 15:31 wsgi.py
+
+(VirEnv1) > mv Main CP  # i.e.,, we first create a "Main" project and then rename it as 'CP'
+# CP : ClassProject
+
+(VirEnv1) > cd CP          # WD : ~/Python_Practice/VirEnv1Projs/Django/CP/
+
+(VirEnv1) > ls             # WD : ~/Python_Practice/VirEnv1Projs/Django/CP/
+Main  manage.py
+
+(VirEnv1) > nano manage.py
+
+# change the first line (of manage.py) to '#!/usr/bin/env python3.11' (just add '3.11')
+# save and exit nano
+
+(VirEnv1) > ./manage.py runserver
+
+# Use FireFox (the one that came with Ubuntu installation) to check 'http://127.0.0.1:8000'
+
+Ctrl-c
+
+(VirEnv1) > ./manage.py runserver 22222
+
+# Use FireFox (the one that came with Ubuntu installation) to check 'http://127.0.0.1:22222'
+
+Ctrl-c
+
+(VirEnv1) > ./manage.py shell
+...
+In [1]: exit()
+
+(VirEnv1) > ./manage.py shell -i python    # i : interface
+...
+>>> exit()
+
+(VirEnv1) > ./manage.py shell
+...
+Python 3.11.13 (main, Jun  4 2025, 08:57:29) [GCC 11.4.0]
+Type 'copyright', 'credits' or 'license' for more information
+IPython 9.5.0 -- An enhanced Interactive Python. Type '?' for help.
+Tip: Use `%timeit` or `%%timeit`, and the  `-r`, `-n`, and `-o` options to easily profile your code.
+
+In [1]: import sys
+
+In [2]: sys.path
+Out[2]: 
+['/home/userName/Python_Practice/VirEnv1Projs/Django/CP',
+ '/home/userName/bin',
+ '/usr/lib/python311.zip',
+ '/usr/lib/python3.11',
+ '/usr/lib/python3.11/lib-dynload',
+ '',
+ '/home/userName/Python_Practice/VirEnv1/lib/python3.11/site-packages']
+
+In [3]: exit()
+
+(VirEnv1) > ./manage.py shell -i python
+...
+Python 3.11.13 (main, Jun  4 2025, 08:57:29) [GCC 11.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+(InteractiveConsole)
+>>> import sys
+>>> sys.path
+['/home/userName/Python_Practice/VirEnv1Projs/Django/CP', '/home/userName/bin', '/usr/lib/python311.zip', '/usr/lib/python3.11', '/usr/lib/python3.11/lib-dynload', '/home/userName/Python_Practice/VirEnv1/lib/python3.11/site-packages']
+>>> exit()
+
+(VirEnv1) > export CP=~/Python_Practice/VirEnv1Projs/Django/CP  # 注意是VirEnv1
+
+(VirEnv1) > nano ~/.bashrc  # and put the following line at the end
+
+export CP=${HOME}/Python_Practice/VirEnv1Projs/Django/CP
+
+# Next time, when we log in (or open a Terminal), 
+# we first >>> Vir[TAB][ENTER] <<<
+# Then, we >>> cd $CP <<<
+
+公曆 20廿五年 九月 六日 週六 十六時二分廿三秒
+
+----------------------------------------------------------------------------------------
+

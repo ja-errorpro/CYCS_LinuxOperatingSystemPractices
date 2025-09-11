@@ -1,0 +1,534 @@
+LinuxPythonClassUbuntuInstallation.txt
+
+1. Google : VirtualBox download
+  https://www.oracle.com/tw/virtualization/technologies/vm/downloads/virtualbox-downloads.html
+  [Windows Installer]
+   ### downloaded virtualbox-7.1.10-169112 on 2025-08-12
+
+安裝 virtualbox    # virtualbox-7.1.10-169112
+
+2. Google : Ubuntu 22.04 download
+  click "Ubuntu 22.04.5 LTS (Jammy Jellyfish)" to go to https://releases.ubuntu.com/jammy/
+  click "64-bit PC(AMD64) desktop image" to download ubuntu-22.04.5-desktop-amd64.iso    # 4.4G
+
+3. # The installation of Ubuntu-22.04 in VirtualBox
+
+Run VirtualBox | [新增]
+
+名稱和作業系統：
+  名稱：Ubuntu-2204-N
+  資料夾：# leave it unchanged. Default location is : C:\Users\<UserName>\VirtualBoxVMs\Ubuntu-2204-N
+  ISO映像：By default, location of your downloaded .iso is >>本機\本機磁碟(C:)\使用者\<UserName>\下載\<<
+          Name of the .iso : ubuntu-22.04.5-desktop-amd64.iso
+          # Select it.
+
+  ------------> 務必：Check [略過無人值守安裝] <------------ 
+
+# 『無人值守安裝』會要求：
+#   1. Enter (a) User name, (b) password, (c) confirm password   
+#   2. Check [Guest Additions]
+#      # Note that the default location is 
+       #         >>C:\Program Files\Oracle\VirtualBox\VBoxGuestAdditions.iso<<
+# 我第一次安裝時沒有選[略過無人值守安裝]，結果被擺了兩道。(a. Not a sudoer.  b. cannot launch Terminal)
+# Tried (but could not reverse the status of not being a sudoer) :
+#   click the Ubuntu-Software-icon on the side bar
+#   Select 'Development'
+#   Install 'Wave Terminal' (scroll down to the end to find it)
+#   Run 'Wave Terminal' # and found out that I am not a 'sudoer'
+
+硬體：
+  基礎記憶體： 2991MB       # 這是假設 there is a total of 8192MB in your computer
+  處理器： 1 CPU           # even though there may be a total of 8 CPUs (if want to run Visual-C)
+
+硬碟：
+  硬碟位置和大小：  
+    # [立即建立虛擬硬碟]
+    30G (20G?)                    # 我自己是給它299.57G，不過那是因為我有1T，而且我是打算可長可久的持續加東西。  
+    # Note that the default location is 
+                >>C:\Users\<UserName>\VirtualBoxVMs\Ubuntu-2204\Ubuntu-2204.vdi<<
+
+==============================================================================
+
+註：
+
+此"安裝硬碟"原始的設計是：先讓使用者(你)try再(由使用者決定是不是要)安裝。若要安裝、則 click "Ubuntu-Installation" icon。
+(如果之前『沒有選[略過無人值守安裝]』的話，它會直接install(即跳過此"test drive"階段))
+
+==============================================================================
+
+Oracle VirtualBox 管理員 | double-click此新裝的虛擬機。
+
+因為我們選的是[略過無人值守安裝]、所以它會問是要try還是要install。
+
+選install。
+
+用tab鍵挑我們要的選項、然後ENTER。
+
+Do not 'Download updates while installing Ubuntu'
+
+當它說它會erase everything on硬碟時，Just CONTINUE (它指的是被Windows+VB所分配到的"硬碟"(而且不會一開始就那麼大))
+
+給user name與password時要小心(必須要記住！！！)  # 機器名稱則是可以隨便取。
+    
+==============================================================================
+
+安裝完之後、Ubuntu系統會重新啟動，你必須用user-name與password登入。
+
+登入之後是回答一連串問題。
+
+如果跳出視窗、曰  "A New version of Ubuntu is available. Would you like to upgrade?" # 指的是24.04
+答案是： [Don't Upgrade] <-----------------------
+
+
+
+如果之後又跳出第二個視窗說  "Software updates are available now. Do you want to update?"
+那就： Yes
+
+# 註： upgrade ≠ update        'update' OK  ;  'upgrade'(= 改OS版本)則是 No，因為這牽涉到安裝軟體時的各種不同版本
+
+
+
+
+Right click desktop，選'Open in Terminal'，然後'sudo apt update' # just to make sure we are sudoers
+
+To stop 「動不動就鎖螢幕」 :
+
+  Click the [Show Applilcations] icon (九宮格) located at the lower left corner of the VM-window
+  | Select the icon named 'Settings' (一個齒輪)
+  | Privacy | Screen | 
+  Automatic Screen Lock : OFF
+  Blank Screen Delay : 15 minutes (or your preferred time of delay for blank screen)
+  
+To make 「Terminal」的fonts smaller or larger : 
+
+  Ctrl-+  or  Ctrl--   // 此二者即menu選項 ： View | Zoom in 或 Zoom out
+
+  // 有可能『Numpad的'+'與'-'』不work，要keyboard上『正常的'+'-key與'-'-key』才會work。
+
+> cd ~
+> mkdir bin
+> cp .bashrc .bashrc-original
+> nano .bashrc
+
+PS1='Ubuntu-2204 : `pwd`
+`whoami` > '
+
+export PATH=${PATH}:~/bin     # usual practice
+
+# Then, save and exit nano
+
+> source .bashrc
+
+
+==============================================================================
+
+Launch Terminal (right click on desk top and select 'Open in Terminal')
+> sudo sync;sync;sync; shutdown now
+
+==============================================================================
+
+1. Create a folder in the host (e.g., Windows) system. Suppose it is >>C:\Win-uBuntu<<.
+
+2. Oracle VirtualBox 管理員 | right-click此新裝的虛擬機 | 設定
+
+一般 | 進階 |
+  共用剪貼簿 : 雙向
+  拖放 : 雙向
+
+'Shared folder' | '+' | Select C:\WIn-Ubuntu and call it 'Win-Ubuntu' | 'Auto mount'
+
+# It is said that the shared-folder functionality will not be in place until "Guest Additions" are installed (AND appropriate software got run).
+
+# Once the procedure is completed, we should get something like >>/media/sf_Win-UBuntu<< after reboot.
+
+# Since the system was not running when I performed the above actions, I did not see /media/sf_Win-UBuntu after reboot. I only saw '/media/<User>/VBOX_GAs_7.1.10/VBoxLinuxAdditions.run' (along with many other files under VBOX_GAs_7.1.10/).  # 'GAs' df= 'GuestAdditions'
+
+Power on the 虛擬機
+
+Case 1 : 有個menu出現於虛擬機window的title bar('檔案', '機器', '檢視', '輸入', '裝置', '說明') # Good.
+Case 2 : 沒有Case 1所說的menu，
+         Do :『keyboard右邊的Ctrl鍵』+ Home鍵   # 使『含六個選項的pop up menu』出現於桌面
+              # 用『往上』『往下』『往左』『往右』箭頭鍵作以下動作
+              檢視
+              縮放模式
+              ENTER
+         # 這應會使('檔案', '機器', '檢視', '輸入', '裝置', '說明')menu出現於虛擬機window的title bar
+
+'裝置' | '插入Guest Additions CD 映像...'   # 指的是VBOX_GAs_7.1.10.iso (系統無反應，不知是否有做任何事)
+'裝置' | '升級Guest Additions CD...'       # 不確定這一action是否為必須。不過也許能迫使上ㄧ個action生效
+
+ls /media/<User>  # to see if we have /media/<User>/VBOX_GAs_7.1.10/ now
+
+# 不確定是否此時需要『虛擬機power off再虛擬機power on』，
+# 如果/media/<User>/VBOX_GAs_7.1.10/不存在、就『虛擬機power off再虛擬機power on』
+
+# Below are steps obtained from the Web. I did it so as to get /media/sf_Win-UBuntu.
+
+> sudo apt install gcc make    # need these two for running VBoxLinuxAdditions.run
+> sudo /media/<User>/VBOX_GAs_7.1.10/VBoxLinuxAdditions.run  # now run it
+
+##### There is an old note of mine, saying running >>net use x:\\vboxsvr\share<< will work. #####
+##### I mention this just in case the above two 'sudo' commands did not work out. #####
+
+# We should have /media/sf_Win-Ubuntu now. Use 'ls /media' to check
+
+# Note : the owner of '/media/sf_Win-Ubuntu' is 'root', and the group of it is 'vboxsf' ;
+#        Ubuntu-2204 ignores any owner-or-group changes made to this dir.
+#        so, we can only make <User> a member of 'vboxsf' in order to access /media/sf_Win-Ubuntu
+
+> sudo usermod -aG vboxsf <User>  # add <User> to the group 'vboxsf' for access /media/sf_Win-UBuntu
+
+Log out, then log in again (so as to make the group change in effect)
+
+# Now, <User> can access the content of /media/sf_Win-Ubuntu, and the user-of-Windows can access
+#      C:\WIn-Ubuntu. The two directories will have the same content.
+
+==============================================================================
+# Some backgroud information :
+# 
+#   After installing a VM, right click the name of this VM | select 設定值。
+# 
+#   In the window that subsequently appears, select 使用者介面。
+# 
+#   Two things are shown (when 使用者介面 is selected) :
+#     - a list of menus, each of which has a list of items
+#     - a list of icons (probably located in the lower part of the window)
+# 
+#   On the line of the menus (alternatively, the line of the icons), there is a
+#   check box. Remember! Only when this check box is checked will the associate line
+#   of menus/icons appear in the title bar of the window-frame containing the VM that is run.
+# 
+#   Without these menus, we cannot do things like mounting an .iso.
+==============================================================================
+
+Power on the VM.
+
+sudo apt install net-tools
+
+ifconfig
+
+--------------------------------------------------------
+
+Q : How do I change the IP of my Ubuntu 22.04 to a fixed IP (192.168.0.57)?
+
+Copilot :
+
+To set a static IP address like 192.168.0.57 in Ubuntu 22.04, you’ll typically use Netplan, which is the default network configuration tool. Here’s how to do it step by step:
+
+🛠️ Step-by-Step: Set Static IP with Netplan
+
+1. Find Your Network Interface Name
+
+Run:
+
+bash
+ip link
+
+Look for something like enp0s3, ens33, or eth0.    # enp0s3
+
+2. Edit Netplan Configuration
+
+Open the Netplan config file:
+
+bash
+sudo cp /etc/netplan/01-network-manager-all.yaml /etc/netplan/01-network-manager-all.yaml-original
+sudo nano /etc/netplan/01-network-manager-all.yaml
+
+3. Modify the File to Use Static IP
+
+# YAML files are sensitive to indentation — use spaces, not tabs.
+
+Here’s an example configuration:
+
+yaml
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp0s3:  # Replace with your actual interface name
+      dhcp4: no
+      addresses:
+        - 192.168.0.57/24
+      gateway4: 192.168.0.1
+      nameservers:
+        addresses:
+          - 8.8.8.8
+          - 1.1.1.1
+
+4. Apply the Configuration
+
+Save and exit (Ctrl+O, Enter, Ctrl+X), then run:
+
+bash
+sudo netplan apply
+
+✅ Verify the Change
+
+bash
+ip a
+
+or
+
+bash
+ip route
+
+--------------------------------------------------------
+
+Q : How do I install an ssh server on my Ubuntu-2204?
+
+Copilot :
+
+To install an SSH server on Ubuntu 22.04, you’ll want to install OpenSSH Server, which is the most widely used SSH implementation. Here’s how to do it:
+
+🛠️ Step-by-Step: Install OpenSSH Server
+
+1. Update Package Lists
+
+bash
+sudo apt update
+
+2. Install OpenSSH Server
+
+bash
+sudo apt install openssh-server
+
+This installs the SSH daemon (sshd) and starts it automatically.
+
+✅ Check SSH Service Status
+
+bash
+sudo systemctl status ssh
+
+You should see something like:
+
+Active: active (running)
+
+If it’s not running, start it manually:
+
+bash
+sudo systemctl start ssh
+
+And enable it to start on boot:
+
+bash
+sudo systemctl enable ssh
+
+Find Your IP Address
+
+To connect to your Ubuntu machine via SSH, you’ll need its IP:
+
+bash
+ip a
+
+Look for an address like 192.168.x.x under your network interface.
+
+🔐 Test SSH Access
+
+From another machine (Linux/macOS/WSL) in the same local area network (LAN), run:
+
+bash
+ssh <User>@192.168.0.57     
+
+Replace <User> with your Ubuntu user and 192.168.0.57 with your IP.
+
+# 192.168.x.x is a LAN-IP ; 
+# to make WAN (wide area network) connections, needs to set up the router (i.e., ssh to the router-IP,
+# and the router "forwards" packets to (e.g.) 192.168.0.57 when it sees port 22 ; see below)
+
+🧱 Firewall Consideration (Optional)
+
+If you’re using ufw (Uncomplicated Firewall), allow SSH:
+
+bash
+sudo ufw allow ssh
+sudo ufw enable
+
+--------------------------------------------------------
+# IF the value of 'enp0s3' is not in the form of XXX.YYY.ZZZ.UUU and is in MAC format
+#    AND 
+#    a message 'Activation of network connection failed' pops up in your Ubuntu
+# 
+#   # In my case, this happens when I change from wireless connection to wired connection.
+#   
+#   First, make sure that network connection is OK (just use the host (i.e., Windows) to check it!).
+# 
+#   There are at least two network connection cards. One is for wired connection. The other
+#   is for wireless connection.
+#   
+#   To change the network connection card that was automatically selected by your Ubuntu VM,
+#   裝置 | 網路 | 網路設定 | 網路 | 介面卡1 
+#   | 改變'橋接介面卡'的[名稱] (i.e., change the value of '名稱' by selecting a different card)
+#   > sudo service network-manager restart
+#   
+#   Ref. 1. Google : VirtualBox activation of network connection failed
+#        2. https://www.youtube.com/watch?v=FbWfQ0FwSp8
+--------------------------------------------------------
+
+Q : How do I change the port that my ssh-server listens to on Ubuntu-2204?
+
+Copilot :
+
+To change the port your SSH server listens on in Ubuntu 22.04, you’ll need to modify the SSH configuration file and restart the service. Here's how to do it safely:
+
+🛠️ Step-by-Step: Change SSH Port
+
+1. Choose a New Port
+
+Pick a port number between 1024–65535 (e.g., 2222) to avoid conflicts with reserved ports.
+
+2. Edit the SSH Configuration File
+
+Open the SSH daemon config:
+
+bash
+sudo nano /etc/ssh/sshd_config
+
+Find the line:
+
+bash
+#Port 22
+
+Add a line beneath it:
+
+bash
+Port 2222
+
+Save and exit (Ctrl+o, ENTER, Ctrl+x).
+
+3. Allow the new port in the Firewall (if enabled)
+
+If you're using ufw:
+
+bash
+sudo ufw allow 2222/tcp
+
+You can also remove the old rule:
+
+bash
+sudo ufw delete allow ssh
+
+4. Restart the SSH Service
+
+bash
+sudo systemctl restart ssh
+
+# hsia : below also should work
+#   > sudo service sshd stop
+#   > sudo service sshd start
+
+✅ Test the new port
+
+From another machine:
+
+bash
+ssh -p 2222 <User>@ip_addr   # if LAN, then ip_addr is 192.168.x.x else ip_addr is ip of the router
+
+🧠 Bonus Tip
+
+If you’re using VirtualBox and you are using NAT (instead of '橋接介面卡' or 'bridged interface'), make sure the port is forwarded (by VirtualBox?) :
+
+Go to VM Settings → Network → Advanced → Port Forwarding
+
+Add a rule:
+  Host Port: 2222
+  Guest Port: 2222
+  Protocol: TCP
+
+--------------------------------------------------------
+
+To connect to this VM from the outside (e.g., 'cmd' of Windows) via ssh :
+
+  > ssh -p 2222 <User>@ip_addr
+
+You can also connect to this VM by using FileZilla via sftp.
+(Use an 'sftp' connection with the port number being '2222'.)
+
+--------------------------------------------------------
+
+Q : How do I check whether ufw is enabled on my Ubuntu-2204?
+
+Copilot :
+
+To check whether ufw (Uncomplicated Firewall) is enabled on Ubuntu 22.04, you can use the following command:
+
+🔍 Check UFW Status
+
+bash
+sudo ufw status
+
+If UFW is enabled, you’ll see something like:
+
+Status: active
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW       Anywhere
+
+If it’s disabled, you’ll see:
+
+Status: inactive
+
+🧠 Bonus: Check UFW Service Status
+
+To see if the UFW service is running at the system level:
+
+bash
+sudo systemctl status ufw
+
+🚀 Enable UFW (if needed)
+
+If it’s inactive and you want to enable it:
+
+# ＦＩＲＳＴ (if you don’t want to lock yourself out)
+
+bash
+sudo ufw allow ssh
+
+# ＴＨＥＮ (remember! only AFTER you have done the above)
+
+bash
+sudo ufw enable   
+
+
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+
+    
+
