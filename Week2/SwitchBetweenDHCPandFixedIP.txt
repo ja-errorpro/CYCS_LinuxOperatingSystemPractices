@@ -1,0 +1,86 @@
+1. There is WAN (Wide Area Network), and there is also LAN (Local Area Network).
+
+2. Take CYCU for example, 140.135.xxx.yyy is an IP on WAN.
+
+3. We can always connect a router (AP?) to the WAN. This router must have a WAN-IP of course.
+
+4. Once we have a router connected to WAN, we can connect our machines to the router. These machines form a LAN.
+
+   * Each machine "behind" the router must have an IP (of course), and this IP is a LAN-IP.
+   * Port-forwarding means : when the router receives a packet from the WAN asking to be sent to port (say) 12345,
+                             the router then checks a (port-forwarding?) table to see which machine should this packet go to ;
+                             then the router "forward" the packet to that machine.
+   * Machines in a LAN can communicate to each other via their LAN-IP (and port numbers).
+   
+   * Unfortunately, different routers may have different ranges of LAN-IPs.
+   * A commonly-used range of LAN-IP is (the following may not be exactly correct) from 192.168.0.1 thru 192.168.0.255.
+
+   * The good thing about having a fixed LAN-IP is this :
+       We set up the LAN-IP and port of machine A to be, say, 192.168.0.96 and 33333.
+       We edit the routing table (port-forwarding table?) so that when a packet is sent from the WAN targeting for port
+         33333, the router knows that this packet should be sent to machine A.
+       This allows us to always be able to connect to WAN-IP-OF-the-router:33333 from any machine on the Web.
+
+   * But if the fixed LAN-IP we use for machine A is not in the range that is allowed by the router, we have a problem!!!
+
+   * A laptop is supposed to be brought with us to go anywhere in the world.
+   * Therefore, it is probably not a very good idea to let a laptop have a fixed LAN-IP. DHCP will be more desirable.
+
+   * There may be situations in which a fixed LAN-IP is desirable for a laptop though, e.g., it is left in your apartment
+     and you still want to connect to it when you are on vacation ("really???").
+
+5. So, here is what my modified suggestions for setting the LAN-IP of your laptop.
+
+   (a) Log in to your Ubuntu-2204.
+   (b) cd /etc/netplan/
+   (c) sudo cp 01-network-manager-all.yaml 01-network-manager-all-fixedIP.yaml
+       # Here, I am assuming that you already did things according to LinuxPythonClassUbuntuInstallation.txt.
+   (d) sudo nano 01-network-manager-all.yaml
+   (e) The original content of 01-network-manager-all.yaml :
+
+# Let NetworkManager manage all devices on this system
+network:
+  version: 2
+  renderer: NetworkManager
+  ethernets:
+    enp0s3:
+      dhcp4: no
+      addresses:
+        - 192.168.0.4/24
+      gateway4: 192.168.0.1
+      nameservers:
+        addresses:
+          - 8.8.8.8
+          - 1.1.1.1
+
+   (f) Change that 'no' of 'dhcp4' to 'yes', and comment all lines below this line.
+       That is, we want the following content : # well, you can delete those commented lines, but I prefer to let them stay.
+
+# Let NetworkManager manage all devices on this system
+network:
+  version: 2
+  renderer: NetworkManager
+  ethernets:
+    enp0s3:
+      dhcp4: yes
+      # addresses:
+      #   - 192.168.0.4/24
+      # gateway4: 192.168.0.1
+      # nameservers:
+      #   addresses:
+      #     - 8.8.8.8
+      #     - 1.1.1.1
+
+    (g) Save and exit nano
+    (h) sudo netplan apply
+    (i) If there is such a day in which you want to give your laptop a fixed IP (one that is accepted by the router-in-charge),
+        just switch the fixedIP-version with this DHCP-version and 'sudo netplan apply'.
+
+    (j) What if you are using DHCP for your laptop, but you still want to connect to this laptop from another machine
+        that is IN the same LAN?
+
+        (i) Check the IP of your laptop. (What instruction should you use?)
+        (ii) From that other machine, connect to this particular IP.
+ 
+
+

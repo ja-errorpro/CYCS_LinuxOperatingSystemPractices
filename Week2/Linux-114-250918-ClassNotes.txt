@@ -1,0 +1,131 @@
+Linux-114-250918-ClassNotes.txt
+
+Today's "program"
+
+1. Change your laptop's IP to DHCP
+2. Test "What is the command to find out about your laptop's IP (supposedly obtained via DHCP)"
+3. ssh connection check
+
+------------------------------------------------------------
+
+Actual course name :
+
+  Understanding Linux by first understanding shell, from a programmer's perspective
+
+Purpose of this course :
+
+1. Ordinary people        <--- (Almost) everyone is here
+     Programmers          <--- Hope you are here already
+       "System players"   <--- Try ＮＯＴ to be here (the subset that is disjoint from Ordinary-People)
+         YOU              <--- Try to be here (a subset of both System-Players and Ordinary-People)
+
+2. In this course, I will lead you into this (supposed) world of YOU ("腳跨兩個世界的你")
+   // so as to make Ubuntu a part of your career and also be very familiar with it.
+   // But don't expect to be automatically transformed into a Linux-man-or-woman. You have to put very real effort into it!
+   // The whole thing is, as always, a "師父引進門，修行在個人" business
+
+3. If you insist on an "I am just an ordinary programmer, and I simply do not want to be a part of this" attitude, then, this is very simply just ＳＡＤ.  完全是心態問題！ # We (programmers) wrote EVERYTHING of "the system." (We may not hvae "the right idea". But once we have an idea, we can ＡＬＷＡＹＳ put it into code!)
+
+------------------
+
+Why is it (= to comfortably live in this world of UNIX/Linux) so important???
+
+＊ Linux (UNIX in fact) is THE operating system (of just about all server systems).
+
+＊ It is where the experts work (and play). 
+   # And and and ... it is actually not very hard to get into it. (it is only a problem of the ＭＩＮＤＳＥＴ.)
+
+＊ It will be nice IF we can treat Linux as 『something that comes handy』, a tool (just like any tool we may use), and also construct "a private world of our own" in it.
+
+* Your goal : Mac OS  # A model system Jobs should be very proud of
+
+Two more things :
+
+＊ How a Linux shell works VS the working of a "PL interpreter"
+
+＊ Linux gives you a realistic feel of what an operating system does (and Operating Systems is a course you will take during your junior year in CYCU-ICE)
+
+The deal : I lead you into this world. Then, you explore this world on your own.
+
+＊ Install your own version of Ubuntu and constantly play with it.
+
+＊ Have a clear understanding of how shell works, and also have a good grasp of the underlying philosophy of UNIX.
+
+＊！！！ Do the practices (and homeworks too！) ＡＬＬ ＢＹ ＹＯＵＲＳＥＬＦ！！！ # cannot be over-emphasized ...
+
+＊ Go from this understanding of how shell works ＴＯ the understanding how an operating system works and how it (Ubuntu-like systems) can be used to your utmost advantage.
+
+＊ Constantly play with it.  Use it well！
+
+------------------------------------------------------------------
+
+How to first learn from this class and then move on in your career :
+
+1. Just come to class and always answer questions the best you can.
+
+2. Preferably take a look back at these class notes after class (and before the exam of course)
+
+3. Write your own private notes (privately of course)
+
+4. Keep all these materials with you when you go to work, and keep on enlarging this "private note reservoir" of yours, including your (preferably edited) records of constantly interacting with Copilot (or Gemini or Codex, what have you).
+
+------------------------------------------------------------------
+
+"A command is an executable, essentially." <-------- REMEMBER THIS！
+
+  ls
+  mkdir bin
+  ls
+  'ls lib' vs. 'ls /lib'
+  ls lib
+  ls /lib
+  echo
+  /usr/bin/echo
+  cp
+  cp /usr/bin/echo ~/bin/Echo    # what is '~'
+  bin/Echo
+  ./bin/Echo  # what is '.'  # what is '..'
+  ~/bin/Echo
+  Echo
+  PATH and $PATH
+  PATH=$PATH...
+  echo
+  Echo
+
+  bash   # or /usr/bin/bash
+  echo
+  /usr/bin/echo
+  Echo
+  ~/bin/Echo
+
+  ls -a
+
+  man ls
+  # Bing : Linux command ls
+
+  cat .bashrc
+  nano .bashrc
+
+  Echo
+  source .bashrc    # or just : ~/.bashrc
+  Echo
+
+"A command is an executable, essentially." <-------- REMEMBER THIS！
+
+------------------------------------------------------------------
+
+4. Everything you need to know about path (the concept, the variable (in Linux or Python), the use)
+
+(a) what is a path (ref. : CmdNameAndFileDirName.jpg)
+(b) what is PATH (and $PATH)
+(c) mkdir ~/bin
+(d) date123
+(e) cd ~/bin ; date > date123
+(f) PATH=$PATH:~/bin
+(g) cd ; date123    # What happened? Why?
+(h) python ; import sys ; sys.path
+(i) Python3-11-Installation.txt    # What happened? Why?
+
+------------------------------------------------------------------
+
+
