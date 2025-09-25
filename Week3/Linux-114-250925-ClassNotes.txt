@@ -1,0 +1,416 @@
+Linux-114-250925-ClassNotes.txt
+
+------------------------------------------------------------------------
+
+"Leftover" of last time :
+
+(c) mkdir  ~/bin
+(d) date123
+(e) cp  /usr/bin/date  ~/bin/date123
+(f) PATH=~/bin:$PATH
+(g) date123    
+
+# What happened in the above? Why?
+
+------------------------------------------------------------------------
+
+# "A command is an executable, essentially."
+
+1. 『Linux指令』的長相(the look of a Linux "command")
+
+『Linux指令』的第一種長相：
+
+  <a path leading to an executable> <argument 1> <argument 2> ...      # "請執行這個檔案！"
+  # the given path cannot be just 'abc' (a name)
+
+『Linux指令』的第二種長相：
+
+  <name of an executable> <argument 1> <argument 2> ...                # "請找到這個檔案、然後執行它！"
+
+Q : What does the system (bash) do when the user gives 第二種長相的command (such as the example below)?
+
+e.g.,
+
+> ssh -p 2222 wang@192.168.50.45
+# 第二種長相  # 注意： =====> -p 2222 <===== 是兩個arguments，二者合起來表達『某個option的設定』
+ 
+> /usr/bin/ssh -p 2222 wang@192.168.50.45
+# 第一種長相
+
+# 假設 
+# > ls
+# .....   abc    .....    # 亦即： 假設有abc這個檔案
+# 
+# > abc .....     # 系統會說「沒abc這個東西」 # 假設整台電腦只有這裏有abc這個執行檔
+# > ..... abc     # 系統不會說「沒abc這個東西」(i.e., 如果有error、一定是別的error、不會是「沒abc這個東西」)
+# 
+# Q : Why the difference?
+
+------------------------------------------------------------------------
+
+2. When you log in to Linux by executing 'ssh' or just open a Terminal on the desktop,
+   you will interact with 'bash'. (i.e., 'bash' is the program that is run, and it interacts with you)
+   # well, bash or csh or ksh or sh or ... 通稱為shell (program)
+
+The main() of 'bash' is something like the following : 
+# This main() is supposedly almost the same as the main() of the PL project you wrote or will write.
+
+  # define NOT !
+  gUserWantsToQuit = false ;
+  char * gUserInput = NULL ;
+  char * gResponse = NULL ;
+
+  while ( NOT gUserWantsToQuit ) {
+
+    printf( "> " ) ;
+
+    GetUserInput( gUserInput ) ;    # until user enters '\n' (but not "\\\n" or "\\ \n" or ...)
+
+    ProcessUserInput( gUserInput, gResponse, gUserWantsToQuit ) ;
+
+    if ( NOT gUserWantsToQuit )
+      print( "%s\n", gResponse ) ;
+    else // gUserWantsToQuit
+      ;  // do nothing (just end this interaction)
+
+  } // while NOT gUserWantsToQuit
+
+重點：
+
+  不管是第一種長相的command、還是第二種長相的command，二者都(只)是char string，(說穿了，一個command只是個string)
+  而ProcessUserInput()的責任是(1)找到那個執行檔、(2)執行那個執行檔。
+
+  同時，ProcessUserInput()在執行那個執行檔時、還必須把<argument 1> <argument 2> ..."傳"給那個執行檔！
+
+  (當然、更別提還要有someone who performs a simple parsing of the user input string ...)
+
+而這意味著：
+
+  任何執行檔(就以『用C程式所產生的執行檔』為例)在執行時、必須要能接受『執行者』在執行此執行檔時所"傳"進來的(字串)參數。
+
+觀念：
+
+  『執行』一個執行檔 ＝ 『呼叫』一個function
+
+觀念：
+
+  A shell script is 『a program that works on the shell level』. 
+  One very important basic instruction of a shell script is 『running an executable』.
+  # C/C++ function 呼叫 functions (呼叫時傳(各種不同型別的)參數) ; script "呼叫" 執行檔 ("呼叫"時傳(字串)參數)
+  Therefore, it should be fair to say that a shell script is, in effect, a "program of programs." 
+  # "King of kings"
+
+e.g., (content of) simplest.sh
+
+#!/bin/bash
+# Comment
+echo Hello ICE!  # 此行當然也可以換成, e.g.,『cp simplest.sh aCopy.sh』或『myOwnPgmN para1 para2』
+
+# running simplest.sh
+
+> chmod 755 simplest.sh   # 使simplest.sh『能被執行』
+> ./simplest.sh           # 執行它
+Hello ICE!
+> 
+
+# A slightly more sophisticated simple example of a shell script
+
+(VirEnv1) > nano Parrot.sh
+
+#!/bin/bash
+
+echo
+
+X=0
+while [ -n "$X" ]
+do
+  echo "Enter some text (or just RETURN to quit)"
+  read X
+  if [ -n "$X" ]; then
+    echo "You entered : $X"
+  fi
+done # while $X not empty
+
+echo "You have a good day!" ; echo
+
+(VirEnv1) > chmod 755 Parrot.sh 
+
+(VirEnv1) > ./Parrot.sh 
+
+Enter some text (or just RETURN to quit)
+Howdi! Nice weather!
+You entered : Howdi! Nice weather!
+Enter some text (or just RETURN to quit)
+Maybe a journey to Mars is good.
+You entered : Maybe a journey to Mars is good.
+Enter some text (or just RETURN to quit)
+  
+You have a good day!
+
+(VirEnv1) > 
+
+順便注意：
+
+  Python programs are NOT called 『programs』. Python programs are called 『scripts』.
+
+  謎之聲：What does this mean? (Is there a meaning for this at all?)
+
+------------------------------------------------------------------------
+
+(VirEnv1) > whereis gcc
+gcc: /usr/bin/gcc /usr/lib/gcc /usr/share/gcc /usr/share/man/man1/gcc.1.gz
+
+(VirEnv1) > ls -al /usr/bin/gcc
+lrwxrwxrwx 1 root root 6  八   5  2021 /usr/bin/gcc -> gcc-11
+
+(VirEnv1) > ls -al /usr/bin | grep gcc
+-rwxr-xr-x  1 root root         428 十一 18  2020 c89-gcc
+-rwxr-xr-x  1 root root         454 十一 18  2020 c99-gcc
+lrwxrwxrwx  1 root root           6  八   5  2021 gcc -> gcc-11
+lrwxrwxrwx  1 root root          23  四  22 11:28 gcc-11 -> x86_64-linux-gnu-gcc-11
+lrwxrwxrwx  1 root root           9  八   5  2021 gcc-ar -> gcc-ar-11
+lrwxrwxrwx  1 root root          26  四  22 11:28 gcc-ar-11 -> x86_64-linux-gnu-gcc-ar-11
+lrwxrwxrwx  1 root root           9  八   5  2021 gcc-nm -> gcc-nm-11
+lrwxrwxrwx  1 root root          26  四  22 11:28 gcc-nm-11 -> x86_64-linux-gnu-gcc-nm-11
+lrwxrwxrwx  1 root root          13  八   5  2021 gcc-ranlib -> gcc-ranlib-11
+lrwxrwxrwx  1 root root          30  四  22 11:28 gcc-ranlib-11 -> x86_64-linux-gnu-gcc-ranlib-11
+lrwxrwxrwx  1 root root           6  八   5  2021 x86_64-linux-gnu-gcc -> gcc-11
+-rwxr-xr-x  1 root root      928584  四  22 11:28 x86_64-linux-gnu-gcc-11
+lrwxrwxrwx  1 root root           9  八   5  2021 x86_64-linux-gnu-gcc-ar -> gcc-ar-11
+-rwxr-xr-x  1 root root       27176  四  22 11:28 x86_64-linux-gnu-gcc-ar-11
+lrwxrwxrwx  1 root root           9  八   5  2021 x86_64-linux-gnu-gcc-nm -> gcc-nm-11
+-rwxr-xr-x  1 root root       27176  四  22 11:28 x86_64-linux-gnu-gcc-nm-11
+lrwxrwxrwx  1 root root          13  八   5  2021 x86_64-linux-gnu-gcc-ranlib -> gcc-ranlib-11
+-rwxr-xr-x  1 root root       27176  四  22 11:28 x86_64-linux-gnu-gcc-ranlib-11
+
+(VirEnv1) > ls -al /usr/bin | grep g++
+lrwxrwxrwx  1 root root           6  八   5  2021 g++ -> g++-11
+lrwxrwxrwx  1 root root          23  四  22 11:28 g++-11 -> x86_64-linux-gnu-g++-11
+lrwxrwxrwx  1 root root           6  八   5  2021 x86_64-linux-gnu-g++ -> g++-11
+-rwxr-xr-x  1 root root      928584  四  22 11:28 x86_64-linux-gnu-g++-11
+
+------------------------------------------------------------------------
+
+3. C (and therefore C++ too) is designed in such a way that when a program is written in C (or C++),
+   its corresponding executable can "receive" the arguments that are "passed" from the command line.
+
+----------------------
+
+# You should already have created ~/bin/
+
+(VirEnv1) > nano ~/.bashrc
+
+# add the following line as the last line of ~/.bashrc
+export PATH=~/bin:$PATH
+
+# save and exit nano
+
+----------------------
+
+The main() of a C/C++ program can be written as :
+
+int main() {
+  ...
+} // main()
+
+But it can also be written as :
+
+int main( int argc, char** argv ) {
+  ...
+} // main()
+
+where 'argc' means "argument count" and 'argv' (argument values) is an array of strings (the arguments).
+# and the argument(-string)s are : argv[0], argv[1], argv[2], ..., argv[ argc - 1 ]
+
+(VirEnv1) > cd
+(VirEnv1) > mkdir Linux_Practice     # WD : ~
+(VirEnv1) > cd Linux_Practice        # WD : ~/Linux_Practice
+(VirEnv1) > nano Echo.cpp
+
+# include <stdio.h>
+
+int main( int argc, char** argv ) {
+
+  for ( int i = 1 ; i < argc ; i++ )
+    printf( "%s ", argv[i] ) ;
+  printf( "\n" ) ;
+
+} // main()
+
+# save and exit 
+
+(VirEnv1) > g++ Echo.cpp
+(VirEnv1) > mv a.out Echo             # WD : ~/Linux_Practice
+(VirEnv1) > ls -al                    # to make sure that we have an executable named 'Echo"
+ 
+(VirEnv1) > Echo hello, this is a beautiful day
+EEEcho: command not found
+
+(VirEnv1) > ./Echo hello, this is a beautiful day
+hello, this is a beautiful day
+
+Q : What happened (with the above two commands and their outputs) and why?
+ 
+(VirEnv1) > ./Echo hello, this         is a       beautiful day
+hello, this is a beautiful day 
+
+# Why this output? What happened to the extra spaces?
+
+Q : What do you think is the content of the program (echo.c) that is used to create 'echo'?
+
+----------------------
+
+# You should have already created ~/bin/
+
+(VirEnv1) > cp Echo ~/bin/
+
+(VirEnv1) > Echo      Hello. This is       a       beautiful        day.
+Hello. This is a beautiful day. 
+
+Q : Why is it the case that when we executed 'Echo hello, this is a beautiful day', it did not work,
+    but now, when we executed 'Echo      Hello. This is       a       beautiful        day.' it worked?
+    (Is it because there were grammar errors or what?)
+
+----------------------
+
+Q : 請解釋：一個『源於C程式的執行檔』如何能在被執行時"收到"『執行者』在執行此執行檔時所"傳"進來的(字串)參數?
+    請以=====>Echo    Hi! How     are     you?<=====的(Echo.cpp的)程式碼與此執行方式解釋之。
+
+----------------------
+
+### Don't know whether the part below should be for this week or the next week ###
+
+(VirEnv1) > echo home directory is ~
+home directory is /home/wang
+
+Q : '~' is changed to '/home/wang'. Did 'echo' make this change?
+
+(VirEnv1) > Echo home directory is ~
+
+Q : Did 'echo' make that change?
+ 
+(VirEnv1) > Echo $PATH
+
+Q : Who made the change?
+ 
+----------------------
+
+(VirEnv1) > cd ~/Linux_Practice
+
+(VirEnv1) > ls                        # WD : ~/Linux_Practice
+Echo  Echo.cpp
+
+(VirEnv1) > nano PrintPara.cpp
+
+# include <cstdio>
+using namespace std ;
+
+int main( int argc, char** argv ) {
+
+  printf( "Number of parameters : %d\n", argc ) ;
+
+  for ( int i = 0 ; i < argc ; i++ )
+    printf( "Para %d >>%s<<\n", i, argv[i] ) ;
+
+} // main()
+
+# Save and exit 
+
+# Some understanding about the relation between cstdio and stdio.h and 'using namespace std' ...
+
+(VirEnv1) > cat CstdioTest.cpp 
+
+# include <cstdio>
+# include <iostream>
+
+int main() {
+
+  std::cout << "Hello\n" ;
+  printf( "Hi\n\n" ) ;
+
+} // main()
+
+(VirEnv1) > g++ CstdioTest.cpp
+(VirEnv1) > ./a.out            # Q : Why must we write './a.out'? Why can't it be just 'a.out'?
+
+(VirEnv1) > g++ -o PrintPara PrintPara.cpp    # meaning of '-o' (introducing 'man')
+
+# 系統怎麼找到g++並執行它？？？ 系統執行(呼叫)g++時有傳什麼參數給它嗎？ g++是如何找到並檢視這些它所收到的參數？
+
+> ls            # 『以上(針對g++)所問的問題』對ls一樣適用
+Echo  Echo.cpp  PrintPara  PrintPara.cpp
+
+> /usr/bin/ls   # Just for fun
+
+(VirEnv1) > PrintPara Which one is in $PATH? ~ or ~/bin?
+PrintPara: command not found
+
+(VirEnv1) > ... # How should we modify the above command? (What should be put here?)
+Number of parameters : 9
+
+Para 0 >>./PrintPara<<
+Para 1 >>Which<<
+Para 2 >>one<<
+Para 3 >>is<<
+Para 4 >>in<<
+Para 5 >>/home/hsia/Python_Practice/VirEnv1/bin:/home/hsia/.local/bin:/home/hsia/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/hsia/bin?<<
+Para 6 >>/home/hsia<<
+Para 7 >>or<<
+Para 8 >>/home/hsia/bin?<<
+
+(VirEnv1) > cp PrintPara ~/bin
+(VirEnv1) > PrintPara Which one is in $PATH? ~ or ~/bin?    # Why does this cmd work now???
+Number of parameters : 9
+Para 0 >>PrintPara<<
+Para 1 >>Which<<
+Para 2 >>one<<
+Para 3 >>is<<
+Para 4 >>in<<
+Para 5 >>/home/hsia/Python_Practice/VirEnv1/bin:/home/hsia/.local/bin:/home/hsia/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/hsia/bin?<<
+Para 6 >>/home/hsia<<
+Para 7 >>or<<
+Para 8 >>/home/hsia/bin?<<
+
+----------------------
+
+Why PrintPara?
+
+We know what an executable expects of the parameters that it receives when this executable is "called".
+
+However, we may not be giving it the right parameters when we "call" this executable on the shell-level.
+
+(We think we are giving it this and that char-strings as parameters. But actually, it may be 
+ receiving string-parameters that are somewhat different from the strings we expect them to be.)
+
+Therefore, we use this custom-made command 'PrintPara' to see whether the parameters we "give" 
+to an executable are indeed the strings we intend to give to this executable.
+
+We will be using PrintPara from time to time from now on.
+
+# below is just for the fun of it ...
+
+(VirEnv1) > echo Hi there > temp1
+(VirEnv1) > PrintPara Hi there > temp2
+(VirEnv1) > ls
+Echo  Echo.cpp  PrintPara  PrintPara.cpp  temp1  temp2
+
+(VirEnv1) > cat temp2
+Number of parameters : 3
+Para 0 >>PrintPara<<
+Para 1 >>Hi<<
+Para 2 >>there<<
+
+Q : What happened in the above? 
+    (i.e., what were the parameters that 'echo' received when we "called" it?
+           Who did what(起碼就『看起來』而言)???   # 此之謂『(所謂的)運算思維』
+    )
+
+----------------------
+
+Next week's 節目 : Linux storage management
+
+----------------------
+
+
+
+
