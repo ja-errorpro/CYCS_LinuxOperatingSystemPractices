@@ -1,0 +1,46 @@
+
+                   Linux-114-251002-ClassNotes.txt
+
+--- Some basic definitions (with corresponding predictions) for the next 10 years or more ---
+
+Vibe code 
+  The code developed by Copilot (or the like) and its user
+  # The user gives reqirements ; Copilot generates code
+
+Vibe coding
+  The process of developing vibe code
+
+Vibe code programmer
+  One who knows how to do vibe coding (and generate vibe code)
+
+Vibe code engineer
+  One who not only can understand vibe code but also can clean up vibe code and modify it if needed
+
+Observations and predictions : 
+
+(1) No doubt. Vibe coding will be the main trend for the future (in just about every profession).
+
+(2) If many pieces of vibe code are put together and these pieces of vibe code were not cleaned up, there may be big problems in the resulting joint code. (buggy and, even worse, not maintainable) 
+
+(3) Therefore, compared to the need for vibe code programmers, vibe code engineers will be much much more in need (and will also get much higher salaries).
+
+(4) But note that the mere existence of vibe coding can make it (and probably has already made it) quite difficult (if not extremely difficult) to train vibe code engineers. (Why???)
+
+Will C/C++ programming ability be in need in the future?
+  C/C++ programming ability may be needed when a vibe code engineer has to look at low-level code
+
+All the above definitions and observations (predictions), plus one famous(?) saying by this instructor :
+   由儉入奢易，由奢入儉難。
+
+--- END - Some basic definitions (and predictions) for the next 10 years or more ---
+
+----------------------------------------------------------------------------------------------------
+
+                                    本日課程重點
+
+                            Storage Management of Linux
+
+----------------------------------------------------------------------------------------------------
+
+
+

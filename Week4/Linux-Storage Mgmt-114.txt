@@ -1,0 +1,60 @@
+Storage Management Practices
+
+# Please refer to the material "Linux Storage Management" to create new partitions: 
+#   /dev/sdb2 with 200M 
+#   /dev/sdb3 with 500M
+
+# Check block devices
+> sudo lsblk
+
+# Create PV and check PV info
+> sudo pvcreate /dev/sdb{2,3}
+> sudo pvscan
+
+# Create VG and check VG info
+> sudo vgcreate myvg /dev/sdb{2,3}
+> sudo vgdisplay myvg
+
+# Create LV and check LV info
+> sudo lvcreate -L 200m myvg -n mylv
+> sudo lvdisplay myvg
+
+# Write a file system and then Attach
+HINT: mkfs && mount && chown
+
+# Resize the LV to 500M
+> sudo lvresize -L 500M /dev/myvg/mylv
+> sudo lvdisplay myvg
+
+# Before resizing the filesystem
+> df -h /data/lvm/mylv
+> sudo resize2fs /dev/myvg/mylv
+
+
+------ Advanced practice, BE careful --------
+> sudo mount /dev/sdb4 /data/sdb4
+> echo "hello world" > /data/sdb4/mount.txt
+> cat /data/sdb4/mount.txt
+    # hello world
+> sudo umount /data/sdb4
+
+### Check the raw data
+> sudo strings -t x /dev/sdb4
+    # (omit)
+    # output something like: 
+        220d034 mount.txt
+        8600000 hello world
+
+### Believe it or not
+> echo "HELL0 W0R1D" > mount-overwrite
+> cat mount-overwrite
+    # HELL0 W0R1D
+> sudo dd if=mount-overwrite of=/dev/sdb4 seek=$((0x8600000)) bs=1
+
+### Check it out
+> sudo mount /dev/sdb4 /data/sdb4
+> ls /data/sdb4
+> cat /data/sdb4/mount.txt
+    # HELL0 W0R1D
+
+> sudo umount /data/sdb4

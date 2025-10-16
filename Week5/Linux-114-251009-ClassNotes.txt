@@ -1,0 +1,799 @@
+
+(VirEnv1) > cd            # WD : ~
+
+(VirEnv1) > ls            # WD : ~
+... Linux_Practice ...
+
+(VirEnv1) > ln -s Linux_Practice Shell_Practice    
+            # Personally, I cannot remember which name I am using. That's why I do this.
+
+(VirEnv1) > ls -alt       # WD : ~
+...
+lrwxrwxrwx  1 wang wang    14  十   6 15:06 Shell_Practice -> Linux_Practice
+...
+drwxrwxr-x  2 wang wang  4096  九  20 12:47 Linux_Practice
+...
+
+# Do a simple introduction to 'ln' and 'ln -s' and how the commands may be easily memorized here.
+# (Below is not related to 'ln'.)
+
+(VirEnv1) > export LINUX="${HOME}/Linux_Practice"
+
+(VirEnv1) > nano ~/.bashrc
+
+# add the following line near the end, save and exit nano
+
+export LINUX="${HOME}/Linux_Practice"
+
+# We cannot name this variable 'SHELL' (we have to use 'LINUX'). Why?  Try this : > echo $SHELL
+
+(VirEnv1) > cd $LINUX      # this will get us to ~/Linux_Practice/
+
+(VirEnv1) >                # WD : ~/Linux_Practice ; just a trick that often comes handy
+
+----------------------------------------------------------------------------------
+
+Q (to Copilot) : How do I check the mount path of a USB flash drive in Ubuntu-22.04?
+
+# Note : in these class-notes, all answers by Copilot are (slightly?) edited by this instructor.
+
+Copilot :
+
+To check the mount path of a USB flash drive (or any device) in Ubuntu 22.04, you can use several methods. 
+
+1. Graphical Method (GUI)
+
+"Files" ( i.e., Nautilus - the default file manager ) → Right-click the name of the USB device 
+→ Properties → check the mount path (e.g., /media/wang/KINGSTON).
+
+2. Terminal Methods
+
+> lsblk -o NAME,MOUNTPOINT
+...
+sdg    
+└─sdg1 /media/wang/KINGSTON
+sr0
+
+# OR
+
+> df -h
+
+Filesystem      Size  Used Avail Use% Mounted on
+...
+/dev/sdg1       2.0G  115M  1.9G   6% /media/wang/KINGSTON
+
+# OR
+
+> mount | grep /dev/sd
+
+...
+/dev/sda3 on / type ext4 (rw,relatime,errors=remount-ro)
+/dev/sda2 on /boot/efi type vfat (rw,relatime,fmask=0077,dmask=0077,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro)
+...
+/dev/sdg1 on /media/wang/KINGSTON type vfat (rw,nosuid,nodev,relatime,uid=1000,gid=1000,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remount-ro,uhelper=udisks2)
+
+# notice 'vfat' (file system type)
+
+Q (Just curious) : What is the difference between 'ext4' and 'vfat'? (What do they mean?)
+
+----------------------------------------------------------------------------------
+
+# Below is just for fun ...
+
+(VirEnv1) > lsblk -o NAME , MOUNTPOINT
+lsblk: ,: not a block device
+lsblk: MOUNTPOINT: not a block device
+
+(VirEnv1) > lsblk -o NAME, MOUNTPOINT
+lsblk: unknown column: NAME,
+
+(VirEnv1) > 
+
+Q : What happened and why?
+
+----------------------------------------------------------------------------------
+
+Q (to Copilot) : 
+
+When I plug in a USB flash drive, the flash drive is automatically mounted by Ubuntu-22.04.  What should I do next to check the file system type of this flash drive?
+
+# Note : in these class-notes, all answers by Copilot are (slightly?) edited by this instructor.
+
+Copilot :
+
+Once your USB flash drive is automatically mounted in Ubuntu 22.04, you can check its file system format (e.g., FAT32, NTFS, exFAT, ext4) using one of the following terminal methods:
+
+> lsblk -f
+
+NAME   FSTYPE   FSVER LABEL       UUID                                 FSAVAIL FSUSE% MOUNTPOINTS
+...
+sda                                                                                          
+├─sda1                                                                                       
+├─sda2 vfat   FAT32                      9C6D-78F2                             505.9M     1% /boot/efi
+└─sda3 ext4   1.0                        89d8d9b4-a510-4393-b33e-1c497cdedaf0  258.8G     7% /
+...
+sdg                                                                                   
+└─sdg1 vfat     FAT32 KINGSTON    BC03-3A9A                               1.8G     6% /media/wang/KINGSTON
+sr0                                                                                   
+
+# OR
+
+# First, run 'df -h' to find device name :
+
+> df -h
+
+Filesystem      Size  Used Avail Use% Mounted on
+...
+/dev/sdg1       2.0G  115M  1.9G   6% /media/wang/KINGSTON
+
+# mount path : /media/wang/KINGSTON ; device name : /dev/sdg1
+
+# Then, use 'blkid' to identify file system type using device name :
+
+> sudo blkid /dev/sdg1
+/dev/sdg1: LABEL="KINGSTON" UUID="BC03-3A9A" BLOCK_SIZE="512" TYPE="vfat" PARTUUID="0fc9d832-01"
+
+# OR
+
+> mount | grep /dev/sd
+
+# results already shown in the above
+
+# OR
+
+‍# (using GUI) :
+
+Open "Disks" from the application menu | Select your USB drive from the left panel
+| "Volumes" → it will show the file system type.
+
+----------------------------------------------------------------------------------
+
+Continued from last time (250925) ...
+
+First, a quick go-thru of Linux-114-250925-ClassNotes.txt (and start from PrintPara.cpp)
+
+(VirEnv1) > PrintPara cd $LINUX     # What gets printed? Who did what in your opinion?
+
+(VirEnv1) > nano temp1.txt
+Hi
+
+(VirEnv1) > PrintPara cd $LINUM  < temp1.txt     # What gets printed? Who did what in your opinion?
+
+----------------------------------------------------------------------------------
+
+        Concept of stdin, stdout, and stderr - How are they decided and by whom 
+
+# stdin : for getting input when no input source is specified ( e.g., scanf() & cin ).
+# stdout : for placing "normal" output when no output destination is specified ( e.g., printf() & cout )
+# stderr : for placing "abnormal" output (e.g., the ones done by the system and not the executable)
+
+Q : Can a being executed executable decide about its stdin/stdout/stderr (and specify what its stdin/stdout/stderr is when the corresponding program is being written)?
+
+Ans. : It CANNOT.
+
+(VirEnv1) > cat Echo.cpp        # WD : ~/Linux_Practice    # You should already have written Echo.cpp
+
+# include <stdio.h>
+
+int main( int argc, char** argv ) {
+
+  for ( int i = 1 ; i < argc ; i++ )
+    printf( "%s ", argv[i] ) ;
+  printf( "\n" ) ;
+
+} // main()
+
+(VirEnv1) > Echo This     is the    day!  > temp2.txt    
+
+# Why does 'Echo' (and not './Echo') work?
+
+# Where did the output go?
+
+(VirEnv1) > cat temp2.txt
+
+Q : printf() just prints something to stdout (it does not have the right to determine what stdout is). 
+    From the above demo, who set up where stdout is (for Echo) in your opinion?
+
+(VirEnv1) > cat PrintPara.cpp
+
+# include <cstdio>
+using namespace std ;
+
+int main( int argc, char** argv ) {
+
+  printf( "Number of parameters : %d\n", argc ) ;
+
+  for ( int i = 0 ; i < argc ; i++ )
+    printf( "Para %d >>%s<<\n", i, argv[i] ) ;
+
+} // main()
+
+(VirEnv1) > cat temp1
+Hi there
+
+(VirEnv1) > PrintPara This     is the    day!  < temp1 > temp3.txt
+
+# What happened to the above program (command?) execution? 
+# Where did the output (of PrintPara) go?
+# Who did what in your opinion?
+
+(VirEnv1) > cat temp3.txt
+
+# What happened to '< temp1'? Seems that it just disappeared. Did anyone do anything about it?
+# Who did what in your opinion?
+
+(VirEnv1) > date    # Let us just say that 'date' is using 'printf()' to print its output ...
+
+(VirEnv1) > date > temp4.txt
+
+(VirEnv1) > cat temp4.txt
+
+(VirEnv1) > date >> temp4.txt
+
+(VirEnv1) > cat temp4.txt
+
+# Who did what in your opinion?
+
+(VirEnv1) > ls                         # WD : ~/Linux_Practice
+a.out  CstdioTest.cpp  Echo  Echo.cpp  Parrot.sh  PrintPara  PrintPara.cpp  temp1  temp2  temp2.txt  temp3.txt  temp4.txt
+
+(VirEnv1) > nano repeater.cpp          # WD : ~/Linux_Practice
+
+# include <cstdio>
+# include <iostream>
+# include <cstring>
+using namespace std ;
+
+// For a line that is 200 char long, we need 201 char-spaces.
+# define SIZE 201
+# define NOT !
+
+int main( ) {
+
+  char ch ;
+  char * str = new char[SIZE] ;
+  bool done = false ;
+
+  printf( "Enter any string, followed by an ENTER. Enter 'done' when you are done.\n" ) ;
+
+  while ( NOT done ) {
+    printf( "> " ) ;
+    // scanf( "%s", str ) ; // this does not get the whole line
+    cin.getline( str, SIZE ) ;
+    // cin >> ch ;     // No need to read in the ENTER char when we use getline()
+    if ( strcmp( "done", str ) == 0 )
+      done = true ;
+    else if ( strcmp( "quit", str ) == 0 )
+      done = true ;
+    else if ( strcmp( "exit", str ) == 0 )
+      done = true ;
+    else // not done or quit or exit
+      printf( "echoing : %s\n", str ) ;
+  } // while NOT done
+
+  printf( "Bye! You have a good day!\n" ) ;
+
+} // main()
+
+(VirEnv) > g++ -o echo.exe repeater.cpp
+
+# Mac : (VirEnv) > g++ -I /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -o echo.exe repeater.cpp
+
+(VirEnv) > ./echo.exe
+Enter any string, followed by an ENTER. Enter 'done' when you are done.
+> What happened?
+echoing : What happened?
+> When did it happen?
+echoing : When did it happen?
+> Where was it?
+echoing : Where was it?
+> done
+Bye! You have a good day!
+
+(VirEnv) > nano input-questions.txt
+What? Really?
+When? Can't believe it!
+Where?    How do you know!
+Who? Can't be!
+How? Terrible!
+Why? So sad!
+done
+These things should happen no more.
+I must say.
+
+(VirEnv) > cat input-questions.txt
+
+(VirEnv) > cat input-questions.txt | ./echo.exe 
+
+Q: What happend? Why is it so in your opinion?  (What does '|' mean to the system?)
+
+Q : printf() just prints something to stdout (it does not have the right to determine what stdout is). 
+    From the above demo, who set up where stdout is (for Echo) in your opinion?
+
+(VirEnv1) > ls -alt                    # WD : ~/Linux_Practice
+total 124
+drwxrwxr-x  2 wang wang  4096  十   6 16:09 .
+-rw-rw-r--  1 wang wang   162  十   6 16:09 input-questions.txt
+-rwxrwxr-x  1 wang wang 16512  十   6 16:05 echo.exe
+-rw-rw-r--  1 wang wang   916  十   6 16:04 repeater.cpp
+-rw-rw-r--  1 wang wang   126  十   6 16:01 temp4.txt
+-rw-rw-r--  1 wang wang   107  十   6 15:39 temp3.txt
+-rw-rw-r--  1 wang wang    18  十   6 15:32 temp2.txt
+drwxr-x--- 20 wang wang  4096  十   6 15:09 ..
+-rwxrwxr-x  1 wang wang 16424  九  20 12:47 a.out
+-rw-rw-r--  1 wang wang   120  九  20 12:47 CstdioTest.cpp
+-rwxr-xr-x  1 wang wang   223  九  20 12:19 Parrot.sh
+-rw-rw-r--  1 wang wang    77  九  19 23:26 temp2
+-rw-rw-r--  1 wang wang     9  九  19 23:25 temp1
+-rwxrwxr-x  1 wang wang 15968  九  19 23:04 PrintPara
+-rw-rw-r--  1 wang wang   229  九  19 23:04 PrintPara.cpp
+-rwxrwxr-x  1 wang wang 16008  九  19 18:13 Echo
+-rw-rw-r--  1 wang wang   160  九  19 18:13 Echo.cpp
+
+# You should have done the following last time. If you did, no need to do the following.
+
+(VirEnv1) > cat Parrot.sh
+#!/bin/bash
+
+echo
+
+X=0
+while [ -n "$X" ]
+do
+  echo "Enter some text (or just RETURN to quit)"
+  read X
+  if [ -n "$X" ]; then
+    echo "You entered : $X"
+  fi
+done # while $X not empty
+
+echo "You have a good day!" ; echo
+
+(VirEnv1) > ./Parrot.sh 
+
+Enter some text (or just RETURN to quit)
+Howdi! Nice weather!
+You entered : Howdi! Nice weather!
+Enter some text (or just RETURN to quit)
+Maybe a journey to Mars is good.
+You entered : Maybe a journey to Mars is good.
+Enter some text (or just RETURN to quit)
+  
+You have a good day!
+
+# END - You should have done the above last time. If you did, no need to do it again.
+
+(VirEnv1) > ./Parrot.sh < input-questions.txt
+
+(VirEnv1) > cat input-questions.txt | ./Parrot.sh
+
+(VirEnv1) > cat input-questions.txt | ./Parrot.sh > temp5.txt
+
+(VirEnv1) > cat temp5.txt
+
+# Explain why the output were so for the above four commands.
+
+(VirEnv1) > ls -alt
+total 128
+-rw-rw-r--  1 wang wang   720  十   6 16:27 temp5.txt
+drwxrwxr-x  2 wang wang  4096  十   6 16:27 .
+-rw-rw-r--  1 wang wang   162  十   6 16:09 input-questions.txt
+-rwxrwxr-x  1 wang wang 16512  十   6 16:05 echo.exe
+-rw-rw-r--  1 wang wang   916  十   6 16:04 repeater.cpp
+-rw-rw-r--  1 wang wang   126  十   6 16:01 temp4.txt
+-rw-rw-r--  1 wang wang   107  十   6 15:39 temp3.txt
+-rw-rw-r--  1 wang wang    18  十   6 15:32 temp2.txt
+drwxr-x--- 20 wang wang  4096  十   6 15:09 ..
+-rwxrwxr-x  1 wang wang 16424  九  20 12:47 a.out
+-rw-rw-r--  1 wang wang   120  九  20 12:47 CstdioTest.cpp
+-rwxr-xr-x  1 wang wang   223  九  20 12:19 Parrot.sh
+-rw-rw-r--  1 wang wang    77  九  19 23:26 temp2
+-rw-rw-r--  1 wang wang     9  九  19 23:25 temp1
+-rwxrwxr-x  1 wang wang 15968  九  19 23:04 PrintPara
+-rw-rw-r--  1 wang wang   229  九  19 23:04 PrintPara.cpp
+-rwxrwxr-x  1 wang wang 16008  九  19 18:13 Echo
+-rw-rw-r--  1 wang wang   160  九  19 18:13 Echo.cpp
+
+----------------------------------------------------------------------------------
+
+                  A Very Quick, Short, but So Very Important Recap
+
+The roles played by stdin/stdout/stderr and '>', '<', and '|' are for EVERY executable/command, 
+disregarding whether the executable/command is a C-executable or a Java-byte-code or 
+a Python-.pyc code or a shell script.
+
+----------------------------------------------------------------------------------
+
+                I/O redirection ( stdin, stdout, stdout, <, >, >>, | ) 
+
+# 還有 1>, 2>, 1>>, 2>>, &>, 2>&1
+
+# Don't worry! I myself can only remember '<' '>' '>>' '|'. 
+# I think I need only add '2>' and '&>' and '&|' to my own understanding of what they are.
+
+# '1>/dev/null'與'2>/dev/null'與'&>/dev/null'(或'>/dev/null') # 下面有解釋
+
+# <<any-string ... ENTERany-string # temporary input file (on-the-site input) # 下面有解釋
+
+# &|  # Analogous to '&>' : "let stdout and stderr of one process be stdin of another process."
+
+
+Q : <, >, >>, |  # What are the differences？
+
+(a) 嚴格說來、應寫'1>'與'2>'(與'1>>'與'2>>')
+    1是stdout 2是stderr
+    如果沒寫number，default就是1(意即stdout)
+
+(b) '&>'的意思是「stdout與stderr皆往同一個地方去」 
+    '&>...' 另一個寫法是 '>...  2>&1'(啊誰記得起來！！！)
+
+(c) '1>/dev/null' (或'>/dev/null')
+    與
+    '2>/dev/null'
+    與
+    '&>/dev/null'
+    是
+   「丟棄不要」的意思
+
+    # On the surface at least, '/dev/null' is what?    # try : 'ls /dev'
+
+----------------------------------------------------------------------------------
+
+                     Let now us talk about end-of-file (EOF)
+
+1.
+
+Use ssh to log in to your Ubuntu. Once you enter, press Ctrl-d. 
+What happened. Why?
+
+Alternatively, open a Terminal on your Ubuntu desktop. Press Ctrl-d in this terminal. 
+What happened?
+
+# Note : Ctrl-d has to be pressed at the start of a new input line. (Pressing it in the middle of
+#        an input line won't work.)
+
+2.
+
+(VirEnv) > python3
+>>> print( 'hi' )
+>>> # Press ENTER for this line. Then, for the next line, press Ctrl-d immediately. What happened?
+
+# Note : Ctrl-d has to be pressed at the start of a new input line. (Pressing it in the middle of
+#        an input line won't work.)
+
+3. 
+
+(VirEnv) > cd $LINUX                      # to get us to ~/Linux_Practice
+
+(VirEnv) > nano copy-print.cpp            # WD : ~/Linux_Practice
+
+# include <cstdio>
+
+int main( ) {
+
+  char ch = '\0' ;         // clang disallows directly using NULL as a char
+  char userInput[ 1032 ] ;
+
+  printf( "Enter any text (including ENTER) with a length that is less than 1000. Press Ctrl-d when you are done.\n" ) ;
+
+  int i = 0 ;
+
+  while ( ( ch = getchar() ) != EOF ) {
+    userInput[ i ] = ch ;
+    i++ ;
+  } // while NOT EOF
+
+  userInput[i] = '\0' ;
+  printf( "\n%s\n", userInput ) ;
+
+  printf( "Bye! You have a good day!\n" ) ;
+
+} // main()
+
+(VirEnv) > g++ -o copy-print.exe copy-print.cpp
+
+# Mac : (VirEnv) > g++ -I /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -o copy-print.exe copy-print.cpp
+
+(VirEnv) > ./copy-print.exe # Be careful！ We only need to enter three lines, followed by Ctrl-d
+Enter any text (including ENTER) with a length that is less than 1000. Press Ctrl-d when you are done.
+For any two parties at war,
+there must be a winner and a loser.
+The world will only honor the winner.
+^D
+For any two parties at war,
+there must be a winner and a loser.
+The world will only honor the winner.
+
+Bye! You have a good day!
+
+(VirEnv) > 
+
+# Note : Ctrl-d has to be pressed at the start of a new input line. (Pressing it in the middle of
+#        an input line won't work.)
+
+Q : What happened? Explain!
+
+4.
+
+# Just a reminder : we already ran the following "command" in the past.
+# (VirEnv) > PrintPara This     is the    day!  < temp1 > temp3.txt
+
+(VirEnv) > cat temp3.txt
+Num of Para. : 5
+Para. $0 : PrintPara
+Para. $1 : This
+Para. $2 : is
+Para. $3 : the
+Para. $4 : day!
+
+(VirEnv) > ./copy-print.exe < temp3.txt
+Enter any text (including ENTER) with a length that is less than 1000. Press Ctrl-d when you are done.
+
+Num of Para. : 5
+Para. $0 : PrintPara
+Para. $1 : This
+Para. $2 : is
+Para. $3 : the
+Para. $4 : day!
+
+Bye! You have a good day!
+
+(VirEnv) > 
+
+Q : Explain why we get this result (when we ran './copy-print.exe < temp3.txt').
+
+----------------------------------------------------------------------------------
+
+So, what does the Ctrl-d character mean to whatever application that is reading an input line (and
+will try to appropriately respond to that input line)?
+
+Why do both 'python3' and 'bash' exhibit the kind of behavior we just saw in the above?
+
+What does the Ctrl-d character mean to whatever application that gets its input from stdin?
+
+When we run Python like '> python3 temp1', why can't we get to interact with Python?
+
+When we run bash like '> bash temp1', why can't we get to interact with bash?
+
+----------------------------------------------------------------------------------
+
+                A Very Quick, Short, but Nevertheless Very Important Recap
+
+Hope you now know what Ctrl-d (at the start of an input line) means to whatever interpreter that
+just keeps on reading an input line from stdin and (processing the content of that input line) and 
+responding to the content of that input line (usually by printing something to stdout).
+
+# Yes, 'bash' is an interpreter. So is 'python3' (and 'java' and your OurScheme/Our-C executable).
+
+----------------------------------------------------------------------------------
+
+                      Shell scripts - A preliminary understanding
+
+(VirEnv) > cd $LINUX
+
+(VirEnv) > nano simpleScript
+
+# I purposely leave a blank line in the above
+
+echo The time now is :  # comment should pose no harm
+date
+echo
+echo The current working directory is :
+pwd
+echo
+echo And this is what we have under `pwd`   # notice the use of back-quotes here
+ls -alt
+echo
+echo Now we call PrintPara and see how it works.
+PrintPara  This      is       the day.  # comments should be skipped
+echo
+echo Let us all have a good day.
+
+# Again some blank lines or comments. Should be okay.
+
+(VirEnv) > chmod u+x simpleScript
+
+(VirEnv) > ./simpleScript
+
+A shell script is a shell-level program. Its basic instructions are the commands (the "calling" of executables). In a sense, a shell script is a "program of programs".
+
+We have seen two shell scripts now : simpleScript and Parrot.sh. While simpleScript demonstrates
+that we can "call" any executable in a shell script, Parrot.sh demonstrates that we can also have
+conditional constructs and loop constructs in a shell script. 
+
+(VirEnv1) > cat Parrot.sh 
+
+#!/bin/bash
+
+echo
+
+X=0
+while [ -n "$X" ]
+do
+  echo "Enter some text (or just RETURN to quit)"
+  read X
+  if [ -n "$X" ]; then
+    echo "You entered : $X"
+  fi
+done # while $X not empty
+
+echo "You have a good day!" ; echo
+
+----------------------------------------
+
+Q (to Copilot) : 
+
+The first line of a bash shell script file is often : #!/usr/bin/env bash. What does this line mean?
+
+Copilot :
+
+The line #!/usr/bin/env bash at the top of a Bash script is called a shebang (or hashbang), and it tells the system how to execute the script.
+
+🔍 Breakdown of #!/usr/bin/env bash
+
+#! : This marks the file as a script and specifies the interpreter.
+
+/usr/bin/env : This is a command that locates the bash executable in the user's environment.
+
+bash : This is the shell that will interpret the script.
+
+✅ Why do we write '/usr/bin/env bash' instead of (just) '/bin/bash'?
+
+Using /usr/bin/env bash is more portable. Because:
+
+It searches for bash in the user's PATH, rather than assuming that it's in /bin/bash.
+
+(On some systems (e.g., macOS, BSD, or custom Linux setups), bash might be installed in a different location.)
+
+Therefore, this approach makes your script more flexible across different environments.
+
+----------------------------------------
+
+Note from this instructor - Part I :   
+
+What is stated in the above by Copilot is not exactly correct.
+
+(1) When we run --->whatever<--- (e.g., > simpleScript # Suppose simpleScript has been made executable),
+    the system (e.g., bash) first searches for a file named 'whatever'.
+
+(2) When the file named 'whatever' is located and found to be an executable TEXT file,
+    the system (e.g., bash) checks the first line of this file.
+
+(3) if the first line of this file is of the form '#!...', the system runs it as
+    --->... path-of-whatever<---
+    where ... is copied directly from that first line and there will be no search-from-PATH.
+
+(4) if the first line of this file is not of the form '#!...', the system runs it as
+    --->/usr/bin/bash path-of-whatever<---
+    and there will be no search-from-PATH either.
+
+----------------------------------------
+
+Note from this instructor - Part II :
+
+  process df= program in execution   # well, an executable in execution ...
+
+  (VirEnv1) > cd $LINUX
+  (VirEnv1) > echo $$                # the PID of the current process
+  (VirEnv1) > echo $PPID             # the PID of the parent process (of the current process)
+
+  (VirEnv1) > nano testScript01      
+  echo PID of testScript01-none : $$
+  echo PPID of testScript01-none : $PPID 
+
+  (VirEnv1) > chmod u+x testScript01  
+    
+  # Different ways of doing the same thing.
+  
+  (VirEnv1) > ./testScript01         # first form
+  
+  (VirEnv1) > bash testScript01      # second form
+  
+  (VirEnv1) > env bash testScript01  # third form
+  
+  (VirEnv1) > bash < testScript01    # fourth form
+
+  # But note that the fourth form is not identical to the other three. Just run the following.
+
+  (VirEnv1) > date < testScript01
+  
+  (VirEnv1) > date testScript01
+
+  Q : Why do 'date < testScript01' and 'date testScript01' exhibit different behaviors?
+  
+  (VirEnv1) > nano testScript02        # this should be followed by 'chmod u+x testScript02'
+#!/usr/bin/date
+echo PID of testScript01-none : $$
+echo PPID of testScript01-none : $PPID 
+
+  (VirEnv1) > chmod u+x testScript02
+
+  > ./testScript02          
+
+  # what do you get? Why this output? (compare it to the output of running 'date testScript01')
+
+----------------------------------------
+
+Note from this instructor - Part III :
+
+  When we write a Python script (Yes, we can write a Python SCRIPT - a text file that is 
+  directly executable), the first line of this Python script has to be 
+  '#!/usr/bin/env python3' (and not just '#!python3' ; why?).
+
+  # This Python script file has to be made executable too, of course. # chmod u+x python-script
+
+  e.g.,
+  (VirEnv1) > nano python-script01
+#!/usr/bin/env python3
+print( 'Hello from Python' )
+exit()
+
+  (VirEnv1) > ./python-script01
+
+  Your job now : explain how python-script01 is executed (by bash).
+
+  Also try the following :
+
+  (VirEnv1) > python python-script01
+
+Q : If we take away the line 'exit()' from python-script01, will './python-script01' still work?
+    Explain why (or why not).
+
+----------------------------------------
+
+  # How about our own command PrintPara ...
+
+  (VirEnv1) > nano testScript03          # WD : ~/Linux_Practice
+#!./PrintPara
+echo this should not be printed
+
+  (VirEnv1) > chmod u+x testScript03
+
+  (VirEnv1) > ./testScript03
+
+  Q : How does this command './testScript03' work? Describe the entire process in reasonable detail.
+      First, the interpreter program (bash) reads in user input and gets './testScript03'. And then???
+
+---------------------------------------------------------------------------------------------
+
+                         What you supposedly have learned for today
+
+1. The roles played by stdin/stdout/stderr and '>', '<', and '|' are for ANY Linux "command", 
+   whether that "command" is a C-executable, a Java-byte-code, a Python-.pyc code, or a shell script.
+
+2. The meaning of Ctrl-d (at the start of an input line) for whatever interpreter that keeps on 
+   reading an input line from stdin and ( processing the content of that input line and )
+   responding to the content of that input line (usually by printing something to stdout).   
+   # bash, python, java, ourScheme, our-C, many CAL solution-code
+
+3. The writing of simple shell scripts. (Just put many Linux commands in it will do)
+   # do not forget to set it to be executable ('chmod u+x file-path')
+
+4. The meaning of      
+
+   (a) path-of-a-script # e.g., > ./testScript01
+
+   (b) bash path-of-a-script   # e.g., > bash testScript01
+
+   (c) env bash path-of-a-script
+
+   (d) bash < path-of-a-script
+
+   # where a script can be a PYTHON SCRIPT (How do we write a python script file???)
+
+   And note that (c) and (d) are not the same in how each one works.
+
+---------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+

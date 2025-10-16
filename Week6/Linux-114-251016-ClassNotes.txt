@@ -1,0 +1,1303 @@
+Linux-114-251016-ClassNotes.txt  # We expect to use two weeks' time to go over this class-note.
+
+----------------------------------------------------------------------------------------------
+AI所帶來的軟體技能轉型.txt    # What exactly is AWS? Why should we know it (not in this class though)?
+----------------------------------------------------------------------------------------------
+
+# Comments from instructors of this class ("Linux Practices and Applications")
+
+A vibe code engineer ought to be able to read, understand, evaluate, annotate, and modify vibe code.
+
+----------------------------------------------------------------------------------------------
+
+I have changed my organization of the file structure for this Linux class. 
+
+# Time to open you labtop and get your Ubuntu-2204 running. # Instructor please checks this.
+
+(1)
+
+(VirEnv) > pwd
+/home/wang/Linux_Practice
+
+(VirEnv) > mkdir -p LinuxClass/TestArea  # 注意有個'-p' option
+
+(VirEnv1) > ls
+LinuxClass
+
+(VirEnv1) > ls LinuxClass/             # Just 'ls Li<TAB>' ; that will do.
+TestArea
+
+(VirEnv1) > cd LinuxClass/TestArea/    # Just 'cd Li<TAB>/Te<TAB>'
+
+(VirEnv1) > mkdir 250925 251009 251016
+
+(VirEnv1) > ls
+250925  251009  251016
+
+(VirEnv1) > cd *25                     # Yes, just '*25' ; Why does it work?
+
+(VirEnv) > pwd
+/home/wang/Linux_Practice/LinuxClass/TestArea/250925
+
+(VirEnv1) > ls ../../..       # WD : ~/Linux_Practice/LinuxClass/TestArea/250925
+...   # Should see the ClassNotes files and various test files  
+
+# 舉凡不是ClassNotes的檔案都必須 move to 它該在的directory (250925/ or 251009/)
+
+# For example (currently, we are under 250925/)
+
+(VirEnv1) > cd ../../..     # to go up to ~/Linux_Practice
+
+(VirEnv1) > mv CstdioTest.cpp  Echo  Echo.cpp  Parrot.sh  PrintPara  \
+PrintPara.cpp  temp1  temp2      ./LinuxClass/TestArea/250925/   # 'LinuxClass/TestArea/250925/'也可
+
+# Q :'\'是啥意義？？？
+# 以上的'mv'指令是在做啥？
+
+(VirEnv1) > ls  ./LinuxClass/TestArea/250925             # WD : ~/Linux_Practice
+CstdioTest.cpp  Echo  Echo.cpp  Parrot.sh  PrintPara  PrintPara.cpp  temp1  temp2
+
+(VirEnv1) > mv copy-print.cpp  echo.exe python-script01  simpleScript  \
+temp2.txt  temp4.txt  testScript01  testScript03 copy-print.exe  \
+input-questions.txt  repeater.cpp     temp1.txt     temp3.txt  \
+temp5.txt  testScript02     ./LinuxClass/TestArea/251009/
+
+# Q :'\'是啥意義？？？
+# 以上的'mv'指令是在做啥？
+
+(VirEnv1) > ls  ./LinuxClass/TestArea/251009             # WD : ~/Linux_Practice
+copy-print.cpp  echo.exe             
+python-script01  simpleScript  temp2.txt  temp4.txt  testScript01  testScript03
+copy-print.exe  input-questions.txt  repeater.cpp     temp1.txt     
+temp3.txt  temp5.txt  testScript02
+
+------------------------------
+
+(2) 
+
+(VirEnv) > export LINUX="${HOME}/Linux_Practice/LinuxClass/TestArea"
+
+(VirEnv) > nano ~/.bashrc
+
+# change the line 'export LINUX=...' to the following line
+export LINUX="${HOME}/Linux_Practice/LinuxClass/TestArea"
+
+---
+
+# 以後可以直接   '> cd $LINUX'  。
+
+----------------------------------------------------------------------------------------------
+
+                  A little bit more understanding about 'ln' vs. 'ln -s' 
+
+----------------------------------------------------------------------------------------------
+
+The question (to the instructor) :
+
+  I need to access an important file from different places (different directories). It will be convenient for me to access it using just a local file name. The important thing though is that there must be just one physical file, and that I must be able to maintain the content of this file. 
+
+  There are two tools I can use : hardlinks (e.g., 'ln original hardlink') and softlinks (e.g., 'ln -s original softlink').
+
+  Which one of these two tools are more suitable for my need?
+
+Ans. (by this instructor) :
+
+  Both tools are appropriate for your need, even if you create a new physical file with the same name (and not just changing the content of the same physical file).
+
+  For softlinks, you might encounter the problem of "broken chains."
+
+  Here is a demo. 
+
+(VirEnv1) > cd $LINUX
+
+(VirEnv1) > ls                      # WD : ~/Linux_Practice/LinuxClass/TestArea
+250925  251009  251016  a.out
+
+(VirEnv1) > cd 251016
+
+(VirEnv1) > date > targetFile     # a file we want to create multiple links to
+
+(VirEnv1) > cat targetFile 
+公曆 20廿五年 十月 十二日 週日 十五時〇分59秒
+
+(VirEnv1) > ln targetFile hardLkFile
+(VirEnv1) > ln -s targetFile softLkFile
+
+(VirEnv1) > ls -ali
+total 16
+10901628 drwxrwxr-x 2 wang wang 4096  十  12 15:02 .
+10901627 drwxrwxr-x 5 wang wang 4096  十  12 11:18 ..
+10901638 -rw-rw-r-- 2 wang wang   64  十  12 15:00 hardLkFile
+10901639 lrwxrwxrwx 1 wang wang   10  十  12 15:02 softLkFile -> targetFile
+10901638 -rw-rw-r-- 2 wang wang   64  十  12 15:00 targetFile
+
+(VirEnv1) > cat softLkFile 
+公曆 20廿五年 十月 十二日 週日 十五時〇分59秒
+(VirEnv1) > cat hardLkFile 
+公曆 20廿五年 十月 十二日 週日 十五時〇分59秒
+
+(VirEnv1) > date > temp           # anther physical file
+(VirEnv1) > cat temp
+公曆 20廿五年 十月 十二日 週日 十五時三分廿七秒
+
+(VirEnv1) > cp temp hardLkFile    # to replace the original physical file with a new physical file
+
+(VirEnv1) > ls -ali
+total 20
+10901628 drwxrwxr-x 2 wang wang 4096  十  12 15:03 .
+10901627 drwxrwxr-x 5 wang wang 4096  十  12 11:18 ..
+10901638 -rw-rw-r-- 2 wang wang   68  十  12 15:03 hardLkFile
+10901639 lrwxrwxrwx 1 wang wang   10  十  12 15:02 softLkFile -> targetFile
+10901638 -rw-rw-r-- 2 wang wang   68  十  12 15:03 targetFile
+10901640 -rw-rw-r-- 1 wang wang   68  十  12 15:03 temp
+
+(VirEnv1) > mv targetFile targetFileNewName      # change of file name
+
+(VirEnv1) > ls -ali
+total 20
+10901628 drwxrwxr-x 2 wang wang 4096  十  12 15:04 .
+10901627 drwxrwxr-x 5 wang wang 4096  十  12 11:18 ..
+10901638 -rw-rw-r-- 2 wang wang   68  十  12 15:03 hardLkFile
+10901639 lrwxrwxrwx 1 wang wang   10  十  12 15:02 softLkFile -> targetFile  # strong-color (broken)
+10901638 -rw-rw-r-- 2 wang wang   68  十  12 15:03 targetFileNewName
+10901640 -rw-rw-r-- 1 wang wang   68  十  12 15:03 temp
+
+(VirEnv1) > mv targetFileNewName targetFile      # change back to the original file name
+
+(VirEnv1) > ls -ali
+total 20
+10901628 drwxrwxr-x 2 wang wang 4096  十  12 15:05 .
+10901627 drwxrwxr-x 5 wang wang 4096  十  12 11:18 ..
+10901638 -rw-rw-r-- 2 wang wang   68  十  12 15:03 hardLkFile
+10901639 lrwxrwxrwx 1 wang wang   10  十  12 15:02 softLkFile -> targetFile # back to normal color
+10901638 -rw-rw-r-- 2 wang wang   68  十  12 15:03 targetFile
+10901640 -rw-rw-r-- 1 wang wang   68  十  12 15:03 temp
+
+(VirEnv1) > cat targetFile 
+公曆 20廿五年 十月 十二日 週日 十五時三分廿七秒
+
+(VirEnv1) > cat hardLkFile 
+公曆 20廿五年 十月 十二日 週日 十五時三分廿七秒
+
+(VirEnv1) > cat softLkFile 
+公曆 20廿五年 十月 十二日 週日 十五時三分廿七秒
+
+# So what exactly is an inode, and what exactly is a file from the system's point of view?
+ 
+----------------------------------------------------------------------------------------------
+
+Let us continue from where we left off last time ...
+
+即Linux-114-251009-ClassNotes.txt - around Line 717 : "Note from this instructor - Part III :" 
+
+Let us start by recalling what you supposedly have learned so far in this course ...
+
+Linux-114-250918-ClassNotes.txt
+
+  Actual course name :
+
+    Understanding Linux by first understanding shell, from a programmer's perspective
+
+  "A command is an executable, essentially."
+
+  The shell variable (also an environment variable) named 'PATH' (and why it is important)
+
+  create ~/bin and add it into $PATH
+
+Linux-114-250925-ClassNotes.txt
+
+  『Linux指令』的第一種長相： /usr/bin/ls -ali   # "請執行(位於)這個(path的)檔案！"
+  
+  『Linux指令』的第二種長相： ls -ali            # "請找到這個檔案(的path)、然後執行它(即位於這個path的檔案)！"
+
+   # 假設'abc'(只)是一個local file
+   What is the difference between 
+     > abc ...   # 這個會『找不到！』，為什麼？
+   and
+     > ... abc   # 這個  不會  『找不到！』，為什麼？
+   ?             
+
+   What do 'argc' and 'argv' of 'int main( int argc, char** argv )' mean? What are they used for?
+
+   Echo.cpp   and ~/bin/Echo           # (VirEnv1) > Echo 'To be or not to be' is a sentence
+   PrintPara.cpp  and ~/bin/PrintPara  # (VirEnv1) > PrintPara 'To be or not to be' is a sentence
+
+   '# include <cstdio>' and '# include <iostream>' vs. 'using namespace' and 'printf()' and 'cout'
+
+Linux-114-251009-ClassNotes.txt
+
+   Explain why '> lsblk -o NAME,MOUNTPOINT' works whereas '> lsblk -o NAME, MOUNTPOINT' does NOT work.
+
+   What are stdin/stdout/stderr, and what do '< abc' and '> xyz' and '&> xyz' on a command line mean?
+   What do all these things have to do with printf(), scanf(), cin and cout?
+   How come when PrintPara is run as '> PrintPara the input is < abc', PrintPara does not "see" 'abc'?
+
+   Who did what?
+
+   Can a being executed executable decide about its stdin/stdout/stderr (and specify what its stdin/stdout/stderr is when the original program is being written)?
+
+   The command 'grep hi' means "for all input lines, print the lines that contain 'hi'".
+   What does the command '> cat abc | grep hi' do?
+
+   What does an interpreter such as bash or Terminal or python3 or ourScheme do when doing I/O?
+   (More specifically, where does it get its input and where does it send its output, 
+    and what kind of I/O instructions are they using?)
+ 
+   Why is it the case that an interpreter ought to be able to handle EOF?
+   Why is it the case that an interpreter ought to be able to handle Ctrl-d?
+   
+   Explain what will happen when we execute the following command 
+       > PrintPara This     is the    day!  < temp1 > temp3.txt
+   In particular, explain what happens to argc, argv, stdin, stdout, and printf.
+
+   The roles played by stdin/stdout/stderr and '>', '<', and '|' are for EVERY executable/command, 
+   disregarding whether the executable/command is a C-executable or a Java-byte-code or 
+   a Python-.pyc code or a shell script.
+
+   A shell script is a program (written in shell lang., with basic instructions being commands such
+   as 'ls', 'echo', 'PrintPara', and what have you). It is a text file with its execution-bit set.
+
+   # Below is the content of Linux-114-251009-ClassNotes.txt that is yet to be talked about today.
+
+   A Python script can be a shell script. Just put '#!/usr/bin/env python3' as the first line of
+   of the script file (and then set the execution-bit of this text file).
+
+(VirEnv1) > cd $LINUX
+
+(VirEnv1) > ls
+250925  251009  251016  a.out
+
+(VirEnv1) > cd *09
+
+(VirEnv1) > ls
+copy-print.cpp  echo.exe python-script01 simpleScript temp2.txt  temp4.txt  testScript01  testScript03
+copy-print.exe  input-questions.txt  repeater.cpp temp1.txt temp3.txt  temp5.txt  testScript02
+
+# Let us now look at (around) Line 717 of Linux-114-251009-ClassNotes.txt (content copied to here)
+
+# Below is copied from Linux-114-251009-ClassNotes.txt (starting from around Line 717, with slight modifications)
+
+Note from this instructor - Part III :
+
+  When we write a Linux script in Python (Yes, we can write a Linux SCRIPT using Python), 
+  the first line of this Python script has to be 
+  '#!/usr/bin/env python3' and not just '#!python3'.
+  Why?
+
+  # Be sure to always set the execution bit of a Python script file (or any script file for that matter) before trying to run it as a command. 
+  # > chmod u+x aPythonScript
+
+  e.g.,
+  (VirEnv1) > nano python-script01
+#!/usr/bin/env python3
+print( 'Hello from Python' )
+exit()
+
+  (VirEnv1) > chmod u+x python-script01
+  (VirEnv1) > ./python-script01
+
+  Your job now : explain how python-script01 is executed (by bash).
+
+  Also try the following :
+
+  (VirEnv1) > python python-script01
+
+Q : If we take away the line 'exit()' from python-script01, will './python-script01' still work?
+    Explain why (or why not).
+
+----------------------------------------
+
+  # How about our own own command PrintPara? Can we package it in a script too?
+
+  # Since '~/bin/' is in $PATH, /usr/bin/env should be able to find PrintPara ...
+
+  (VirEnv1) > nano testScript03          # WD : ~/Linux_Practice/LinuxClass/TestArea/251009
+#!/usr/bin/env PrintPara
+echo this should not be printed
+
+  (VirEnv1) > chmod u+x testScript03
+
+  (VirEnv1) > ./testScript03
+
+  Q : How does this command './testScript03' work? Describe the entire process in reasonable detail.
+      First, the interpreter program (bash) reads in user input and gets './testScript03'. And then???
+
+---------------------------------------------------------------------------------------------
+
+      Summary of what you supposedly have learned from Linux-114-251009-ClassNotes.txt
+
+1. The roles played by stdin/stdout/stderr and '>', '<', and '|' are for ANY Linux "command", 
+   whether that "command" is a C-executable, a Java-byte-code, a Python-.pyc code, or a shell script.
+
+2. The meaning of Ctrl-d (at the start of an input line) for whatever interpreter that keeps on 
+   reading an input line from stdin and (processing the content of that input line and)
+   responding to the content of that input line (usually by printing something to stdout).   
+   # bash, python, java, ourScheme, our-C, and many of your past CAL solution-code
+
+3. The writing of simple shell scripts. (Just put many Linux commands in it will do)
+   # do not forget to set it to be executable ('chmod u+x file-path')
+
+4. The meaning of      
+
+   (a) path-of-a-script # e.g., > ./testScript01
+
+   (b) bash path-of-a-script   # e.g., > bash testScript01
+
+   (c) env bash path-of-a-script
+
+   (d) bash < path-of-a-script
+
+   # where a script can be a PYTHON SCRIPT (How do we write a python script file???)
+
+   And note that (c) and (d) are not the same in how each one works.
+
+END - Linux-114-251009-ClassNotes.txt
+
+---------------------------------------------------------------------------------------------
+
+                           Why shell scripts?                         # by Copilot
+
+Shell scripts are essential because they :
+
+  Automate repetitive tasks : 
+    Like backups, software installation, log rotation, or system monitoring.
+
+  Glue together system utilities (e.g., grep, awk, sed, find, curl) : 
+    Shell scripts orchestrate these tools to perform complex workflows.
+
+  Support system boot and configuration : 
+    Many Linux startup processes and configuration files are shell scripts 
+    (e.g., /etc/init.d/* and systemd service scripts).    # will talk about this in this class
+
+---------------------------------------------------------------------------------------------
+
+                       What do Shell Scripts Generally Do?           # again by Copilot
+
+Shell scripts typically :
+
+  Run sequences of commands (ls, cd, rm, ...)
+
+  Handle files and directories (copy, move, delete, compress)
+
+  Parse and transform text (grep, awk, sed)
+
+  Monitor system status (CPU, memory, disk usage)
+
+  Schedule tasks (via cron)
+
+  Manage software installation and updates
+
+  Control services and daemons
+
+---------------------------------------------------------------------------------------------
+
+(Linux) shell scripts (.bat for Windows) are often written in shell languages.
+
+# Just equate bash with the OurScheme/Our-C interpreter you have written or will write.
+# This is the way to understand bash. (The same thing can be said about the Python interpreter)
+
+  // The basic outline of any command interpreter (bash, python, your OurScheme/Our-C interpreter)
+  
+  # define NOT !
+  gUserWantsToQuit = false ;
+  char * gUserInput = NULL ;
+  char * gResponse = NULL ;
+  
+  while ( NOT gUserWantsToQuit ) {
+    
+    printf( "> " ) ;
+    
+    GetUserInput( gUserInput ) ;    # until user enters '\n' 
+                                    # or until the user-command has come to an end.
+    
+    ProcessUserInput( gUserInput, gResponse, gUserWantsToQuit ) ;
+    
+    if ( NOT gUserWantsToQuit )
+      print( "%s\n", gResponse ) ;
+    
+    else // gUserWantsToQuit
+      ;  // do nothing (just end this interaction)
+
+  } // while NOT gUserWantsToQuit
+
+The main focus of a shell script is : 
+
+    to perform system functions and also to manage files (and the directory structure).
+
+# THE data structure of a shell script is "the system", the file system in particular.
+
+Take bash (which is nothing but a command interpreter) for example ... 
+
+bash provides extensive support for testing file-attributes. This includes the testing of whether if
+
+  # below is taken from the result of running 'man bash'
+  file exists.
+  file exists and is a block special file.
+  file exists and is a character special file.
+  file exists and is a directory.
+  file exists and is a regular file.
+  file exists and is set-group-id.
+  file exists and is a symbolic link.
+  file exists and its ``sticky'' bit is set.
+  file exists and is a named pipe (FIFO).
+  file exists and is readable.
+  file exists and has a size greater than zero.
+  file descriptor fd is open and refers to a terminal.
+  file exists and its set-user-id bit is set.
+  file exists and is writable.
+  file exists and is executable.
+  file exists and is owned by the effective group id.
+  file exists and is a symbolic link.
+  file exists and has been modified since it was last read.
+  file exists and is owned by the effective user id.
+  file exists and is a socket.
+  file1 and file2 refer to the same device and inode numbers.
+  file1 is newer (according to modification  date)  than  file2,  or  if  file1
+           exists and file2 does not.
+  file1 is older than file2, or if file2 exists and file1 does not.
+
+For just about all these supports (for checking file attributes), Python provides its corresponding supports :
+
+Examples : (Thanks! Copilot!)
+
+>>> import os
+>>> from pathlib import Path
+
+# to check whether a file exist
+
+>>> os.path.exists("example.txt")
+
+>>> path = Path("example.txt")
+>>> path.exists()
+
+# to check whether it is a file (and not a directory)
+
+>>> os.path.isfile("example.txt")
+
+# to check whether it is a directory
+
+>>> os.path.isdir("example.txt")
+
+# to compare the last modified times of two files
+
+>>> file1 = "path/to/file1.txt"
+>>> file2 = "path/to/file2.txt"
+>>> if os.path.getmtime(file1) > os.path.getmtime(file2):
+>>>   print( f"{file1} was modified more recently than {file2}" )
+
+>>> file1 = Path("file1.txt")
+>>> file2 = Path("file2.txt")
+>>> if file1.stat().st_mtime > file2.stat().st_mtime:
+>>>   print( f"{file1} is newer than {file2}" )
+
+# to check whether a file is a symbolic link
+
+>>> os.path.islink("example.txt")
+
+>>> path = Path("example.txt")
+>>> path.is_symlink()
+
+# to check whether a file is a socket
+
+import stat
+
+pathStr = "my_socket.sock"
+
+if os.path.exists(pathStr) and stat.S_ISSOCK(os.stat(pathStr).st_mode):
+  print("It's a socket.")
+
+path = Path("my_socket.sock")
+
+if path.exists() and stat.S_ISSOCK( path.stat().st_mode ) :
+  print("It's a socket.")
+
+# fork()
+
+pid = os.fork()
+
+if pid == 0:
+  # This is the child process
+  print("Child process running...")
+else:
+  # This is the parent process
+  print(f"Parent process. Child PID: {pid}")
+
+Is There a Need for fork() in Python?
+
+It all depends.
+
+✅ When is fork() useful?
+
+Building daemon processes or custom process managers
+Implementing low-level concurrency or parallelism
+Creating sandboxed subprocesses for isolation
+Mimicking shell-like behavior (e.g., launching background jobs)
+
+🚫 When is it better to avoid the use of fork()?
+
+For most Python workflows, especially portable scripting, fork() is overkill. Use subprocess.run() or multiprocessing.Process() instead. They’re safer, cross-platform, and more Pythonic.
+
+To run an external command : 	subprocess.run()
+
+To spawn parallel Python code	:   multiprocessing.Process()
+
+For background task/thread :  threading.Thread()
+
+For async I/O :  asyncio
+
+# To check if a file exists and is a character special file
+
+Character special files are typically device files like /dev/null or /dev/tty.
+
+import os
+import stat
+
+pathStr = "/dev/null"  # example character device
+
+if os.path.exists(pathStr) and stat.S_ISCHR(os.stat(pathStr).st_mode):
+  print("It's a character special file.")
+else:
+  print("It's not a character special file.")
+
+---------------------------------------------------------------------------------------------
+
+There is a distinction between shell variables and environment variables (for a shell).
+
+# Shell variables, Scheme-variables and C-global-variables are basically the same idea.
+
+To examine shell variables : set -o posix ; set
+
+To examine environment variables : env
+
+e.g.,
+  > set -o posix ; set | less
+  > set -o posix ; set | grep HOME
+  > env | less
+  > env | grep PWD
+
+When a shell variable has been designated as an environment variable, this shell/environment variable will be "exported" as one of the environment variables of the process that is run by the current process or one of its descendent processes.
+
+# to run a user "command", bash uses 'system()' or one of : execl(), execlp(), execle(), execv(), execve(), execvp(), and execvpe().
+
+In other words, any UNIX/Linux process P will have a collection of environment variables to start with, and this collection of environment variables of P is a copy of the collection of environment variables of the parent process of P.
+
+In addition to checking the values of shell/environment variables, bash provides supports for
+
+  checking if the shell variable varname is set (has been assigned a value)
+  checking if the shell variable varname is set and is a name reference
+
+---------------------------------------------------------------------------------------------
+
+事實上，UNIX的創造者(也是C的創造者)從一開始就刻意使C這個language同樣具備了『半個shell language』的身份。
+也就是說，我們(起碼在理論上)可以試著用C(and C++ for that matter)寫Linux shell scripts、
+做Linux shell scripts該做的工作(亦即：各種『系統管理工作』、以及各式各樣的『檔案與目錄的更新與維護』)
+
+(VirEnv1) > sudo ln -s /usr/include/x86_64-linux-gnu/sys /usr/include/sys 
+
+/usr/include/stdlib.h    # system(), getenv(), setenv(), unsetenv()
+/usr/include/unistd.h    # exec() family, getpid(), getppid(), chown(), chdir(), rmdir(), environ[]
+/usr/include/sys/stat.h  # mkdir(), chmod()
+/usr/include/stdio.h     # remove(), rename()
+
+# Mac : /Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk/usr/include/
+
+(VirEnv1) > cat /usr/include/unistd.h | egrep extern | less   # How does this chain of cmd work?
+
+--------------
+
+# a reminder : 
+#       process df= program in execution   # well, an executable in execution ...
+
+Unix/Linux allows each process to have an associated "environment" (= a set of (environment) variable-value pairs).
+
+  extern char **environ ;  // alternatively, you can just put '# include <unistd.h>' here
+
+Ref. https://notes.shichao.io/apue/ch7/ # where 'environ' (of the current process) points to in memory.
+
+To access the content of THE ENVIRONMENT (即the content of 'environ[]') OF THE CURRENT PROCESS, use the following functions.
+
+  # include <stdlib.h>  // in order to use the following functions
+
+  // the following is already declared in stdlib.h ; no need to declare them again.
+  // the purpose of showing these declarations here is just to show that they exist
+
+  char *getenv( const char *name );
+  // Returns a pointer to the string value associated with 'name', NULL if not found
+
+  int putenv( char *str );
+  /* Put STR, which is of the form "NAME=VALUE", in the environment.
+     If there is no `=', remove NAME from the environment.  */
+  // Returns 0 if OK, nonzero on error
+
+  int setenv( const char *name, const char *value, int rewrite );
+  /* Set NAME to VALUE in the environment.
+     If REPLACE is nonzero, overwrite an existing value.  */
+   
+  Q : doesn't the word 'set' already mean "overwrite" ???
+
+  /* Remove the variable NAME from the environment.  */
+  int unsetenv( const char *name );
+
+(There is no reference to putenv or setenv or unsetenv in 
+                   https://www.cplusplus.com/reference/cstdlib/
+ However, we can find protocols of these three functions in /usr/include/stdlib.h.)
+
+(VirEnv1) > cat /usr/include/stdlib.h | less     
+            # Key in '/setenv', followed by ENTER ; PAGE UP/DOWN; HOME to get to top of page
+
+--------------
+
+What "the call stack" really looks like
+
+https://stackoverflow.com/questions/63821293/how-does-setenv-and-unsetenv-change-the-stack
+
+stack smashing
+
+https://stackoverflow.com/questions/40489161/why-this-piece-of-code-can-get-environment-variable-address
+
+--------------
+
+(VirEnv1) > cd $LINUX
+
+(VirEnv1) > ls           # WD : ~/Linux_Practice/LinuxClass/TestArea
+250925  251009  251016  a.out
+
+(VirEnv1) > cd *16       # WD : ~/Linux_Practice/LinuxClass/TestArea/251016
+
+(VirEnv1) > nano PrintEnv.c
+
+# include <stdio.h>
+
+extern char **environ ;    // alternatively, we can just use '# include <unistd.h> ;'
+
+int main( int argc, char **argv ) {  
+// some compilers allow a third argument >>char** envp<< which is not POSIX-compliant  
+// # 謎之聲：what is 'POSIT-compliant'?
+
+  for ( int i = 0 ; environ[i] != NULL ; i++ ) {
+
+     printf( "environ[%d] : >>%s<<\n", i, environ[i] ) ;
+
+     // printf( "envp[%d]    : >>%s<<\n", i, envp[i] ) ;
+
+  } // for every environment variable-value pair (every 'NAME=VALUE' string) in environ[]
+
+  return 0 ;
+
+} // main()
+
+> g++ -o PrintEnv PrintEnv.c
+
+> ./PrintEnv
+environ[0] : >>TERM=xterm<<
+environ[1] : >>SHELL=/bin/bash<<
+...
+environ[21] : >>LESSOPEN=| /usr/bin/lesspipe %s<<
+environ[22] : >>LESSCLOSE=/usr/bin/lesspipe %s %s<<
+environ[23] : >>BASH_FUNC_quote%%=() {  local quoted=${1//\'/\'\\\'\'};
+ printf "'%s'" "$quoted"
+}<<
+environ[24] : >>_=./PrintEnv<<
+
+> env  # should see the same results
+
+> strings /proc/$$/environ    # '$$' will be first expanded to be the process id of the current process
+
+重點：Every executable (run in a UNIX/Linux environment) has its own copy of 'environ[]'
+     其內容就是所謂的"environment variables" (along with their associated (string-)values)
+
+> nano PrintVar.cpp
+
+# include <unistd.h>
+# include <stdio.h>
+# include <stdlib.h>
+
+int main( int argc, char** argv ) {
+
+  int pid = getpid() ;
+
+  printf( "My pid is : %d\n", pid ) ;
+
+  int ppid = getppid() ;
+
+  printf( "My parent pid is : %d\n", ppid ) ;
+
+  for ( int i = 2 ; i <= argc ; i++ ) {
+
+    char * val = getenv( argv[i-1] ) ;
+    printf( "%s : %s\n", argv[i-1], ( val == NULL ) ? "" : val  ) ;
+
+  } // for every argument specified by the user on the command line when invoking this executable
+
+  printf( "=== Done - PrintVar. ===\n" ) ;
+
+} // main()
+
+> g++ -o PrintVar PrintVar.cpp
+
+> export abc='Hi there! How are you!'
+
+> echo $$
+26885
+
+> ./PrintVar abc
+My pid is : 27882
+My parent pid is : 26885
+abc : Hi there! How are you!
+=== Done - PrintVar. ===
+
+> restAssured='1 3 5 7 9'
+
+> echo $restAssured
+1 3 5 7 9
+
+> ./PrintVar abc restAssured
+My pid is : 27909
+My parent pid is : 26885
+abc : Hi there! How are you!
+restAssured :
+=== Done - PrintVar. ===
+
+> printenv abc
+Hi there! How are you!
+> printenv restAssured
+>
+
+> bash -c 'echo $abc'    
+# Use 'man bash' or 'https://man7.org/linux/man-pages/man1/bash.1.html' to see what '-c' is for
+Hi there! How are you!
+> bash -c 'echo $restAssured'
+
+>
+
+> nano AddVarCallPrintVar.cpp
+
+# include <unistd.h>
+# include <stdio.h>
+# include <stdlib.h>
+
+int main( int argc, char** argv ) {
+
+  int pid = getpid() ;
+
+  printf( "My pid is : %d\n", pid ) ;
+
+  int ppid = getppid() ;
+
+  printf( "My parent pid is : %d\n", ppid ) ;
+
+  putenv( (char *) "HiThere=WhatHappened" ) ;
+
+  printf( "Executing ### system( \"./PrintVar HiThere\" ) ### ...\n" ) ;
+
+  system( "./PrintVar HiThere" ) ;
+
+  system( "bash -c 'echo $abc'" ) ;      
+  // we add 'bash' here to make sure that bash is used to interpret the list
+  system( "bash -c 'echo $restAssured'" ) ;
+  system( "bash -c 'echo $HiThere'" ) ;
+
+  printf( "=== Done - AddVarCallPrintVar. ===\n" ) ;
+
+} // main()
+
+> g++ -o AddVarCallPrintVar AddVarCallPrintVar.cpp
+
+> ./AddVarCallPrintVar
+My pid is : 27981
+My parent pid is : 26885
+Executing ### system( "./PrintVar HiThere" ) ### ...
+My pid is : 27983
+My parent pid is : 27982
+HiThere : WhatHappened
+=== Done - PrintVar. ===
+Hi there! How are you!
+
+WhatHappened
+=== Done - AddVarCallPrintVar. ===
+
+>
+
+--------------------------------------------------------
+
+On the side (the DOT command)
+
+> nano PrintPID.sh
+
+echo my PID is :
+echo $$
+echo my parent-PID is :
+echo $PPID
+
+> chmod u+x PrintPID.sh
+
+> ./PrintPID.sh     # fork a child-shell to exec() 'bash' and let './Print.sh' be the sole arugment of 'bash'
+my PID is :
+6789
+my parent-PID is :
+12367
+
+> . ./PrintPID.sh   # directly execute the content of './Print.sh' in the current shell
+my PID is :
+12367
+my parent-PID is :
+12366
+
+--------------------------------------------------------
+
+Also on the side (How should we view an environment function? What is its role???)
+
+An environment function is a "shell script template". When an environment function is run (perhaps with positional parameters), the content of the environment function (which is a bunch of command lines, with all positional parameters replaced by the corresponding actual parameters) is run directly BY THE CURRENT SHELL. It is very likely that the system (the current shell) just replaces the call of an environment function with its (properly filled) content and then uses the DOT command to execute this replaced content.
+
+> function MyEcho() {
+$   echo $1
+$ } # MyEcho()
+
+> cp PrintPID.sh ~/bin/PrintPID
+
+> PrintPID ; MyEcho hi ; PrintPID
+My pid is : 8525
+My parent pid is : 12367
+hi
+My pid is : 8526
+My parent pid is : 12367
+
+---------------------------------------------------------------------------------------------
+
+An environment variable is a shell variable, but not vice versa.
+
+Shell built-in variables
+
+  // just to notice the existence of these '$.' as of now
+  $# number of arguments
+  $* all arguments to shell
+  $@ similar to $*, but ...
+  $- options supplied to the shell
+  $? return value of the last command executed
+  $$ Process-id of the shell
+  $! process-id of the last command started with '&'
+
+> nano MyEcho1  # Key in the following
+
+  echo
+
+  echo "Values of \$0 \$1 \$2 are : " $0 $1 $2
+  echo "Values of \$0 is : " $0
+  echo "Total number of arguments is : " $#
+
+  # '$-' doesn't seem to work
+  # echo "Options supplied are : " $-
+
+  echo "Here is the list of all arguments : " $*
+  echo "Process ID of this shell : " $$
+  echo "Return status of last executed command : " $?
+
+  ls /WhatIsThisAnyway
+  echo "Return status of last executed command : " $?
+
+  echo
+
+# Now Save and exit
+
+> chmod u+x MyEcho1   # 這就是一般所謂的 "shell script (file)"
+                       # a shell script is, in effect, a program
+
+> ./MyEcho1 10 20 '30 40' 50
+
+> ./MyEcho1 `ls ~`    # 就像執行C程式的執行檔一樣，接受command line options
+
+> cp MyEcho1 ~/bin
+
+> MyEcho1 `ls -al ~`  # You just added 'MyEcho1' into your cmd-to-use
+
+> nano MyEcho2 # enter the following
+
+  for i in $* ; do echo $i ; done
+
+> chmod u+x MyEcho2
+
+> ./MyEcho2 `ls ~`
+
+# Now, make MyEcho2 your cmd-to-use (What should you do to make it a cmd-to-use?)
+
+> MyDate(){ date;date;} # 要有SPACE與最後的';'
+
+> MyDate
+
+> MyDateAgain() {
+  date
+  date
+} # MyDateAgain()
+
+> MyDateAgain
+
+
+------------------------------------------------------------------------------------------
+
+In this class, we will try to use Python to write shell scripts.
+
+However, we cannot rule out that there may be times when bash shell scripts or even C programs are better suited for the job.
+
+We will see.
+
+---------------------------------------------------------------------------------------------
+
+We need to get some Python preliminaries done first.
+
+---------------------------------------------------------------------------------------------
+
+              Python preliminaries (for writing shell scripts in Python)
+
+1. It should make no difference whether you are using Python 3.10 or Python 3.11.
+   (see Python-114-1-Python3-11-Installation.txt for installing 3.11 and VE if you are interested).
+
+   Ubuntu-2204 comes with Python-3.10, and everything supposedly should work well with 3.10.
+
+   If you have done what Python-114-1-Python3-11-Installation.txt says, then you can still
+   stick to 3.10 (and should encounter no problem) by not activating the virtual environment, 
+   or you can use Python 3.11 by activating the virtual environment.
+
+   In my ClassNotes, I am using Python-3.11 in a virtual environment. 
+
+   Since we are only dealing with 'os' and 'sys', it should make no difference which 
+   version of Python you are using.
+
+   (白話：You can just stick to the original python3 that comes with Ubuntu-2204, and there
+         is no need to switch to Python 3.11 and use a virtual environment.)
+
+2. You ought to have the following line in ~/.bashrc. 
+
+export PYTHONPATH=~/bin:~/.local/lib/python3.10/site-packages
+
+If you do not have this line in ~/.bashrc, do the following.
+
+  (VirEnv1) > export PYTHONPATH=~/bin:~/.local/lib/python3.10/site-packages
+
+  (VirEnv1) > nano ~/.bashrc    # and add the following line into .bashrc
+
+export PYTHONPATH=~/bin:~/.local/lib/python3.10/site-packages
+
+3. Download CI_StartUpScript.py and Environ.py from ilearning and put these two files under ~/bin.
+
+4.
+  (VirEnv1) > python       # Alternatively (if Python 3.10), just #### > python3        
+
+  >>> from CI_StartUpScript import *
+
+  >>> help( B )
+
+  >>> help( B1 )
+
+  >>> B( 'pwd' )     # just to show that we can run Linux commands WITHIN a Python shell script
+
+  >>> B( 'ls -ali' ) # Problem? : Linux commands on last line and this line are executed in diff. processes (hence slightly different environments) 
+
+  >>> str1, _ = B1( 'ls -ali' )
+
+  >>> print( str1 )
+
+  >>> dir( os )
+
+  >>> pp( os )     # to get a concrete feel of the kind Linux supports Python provides us with
+
+---------------------------------------------------------------------------------------------
+
+                         Two example Linux shell scripts
+
+---------------------------------------------------------------------------------------------
+
+                 Linux shell script 1 : ipynb2py
+
+1. Download the following three files from ilearning and put under 
+                               ~/Linux_Practice/LinuxClass/TestArea/251016 :
+
+     ipynb2py_original.py
+     ipynb2py_original_01.ipynb
+     py2ipynb-original_01.ipynb
+
+2. 
+
+(VirEnv1) > cd $LINUX
+
+(VirEnv1) > ls             # WD : ~/Linux_Practice/LinuxClass/TestArea
+250925  251009  251016  a.out
+
+(VirEnv1) > cd *16
+
+(VirEnv1) > ls             # WD : ~/Linux_Practice/LinuxClass/TestArea/251016
+hardLkFile  ipynb2py_original_01.ipynb  ipynb2py_original.py  py2ipynb_original_01.ipynb  softLkFile  targetFile  temp
+
+3. One way of obtaining user input in Python is by doing something like the following.
+
+(VirEnv1) > python3
+...
+
+>>> user_input = input( "Please enter a sentence : " )
+Please enter a sentence : Hello there!
+>>> 
+
+>>> print( "Your input was : " + user_input + "\n\n" )
+Your input was : Hello there!
+
+
+>>> 
+
+4. Your job :
+
+(a) (VirEnv1) > cp ipynb2py_original.py ipynb2py.py  # always keep the original
+
+(a) Use a text editor (nano?) to change the content of ipynb2py.py (only slightly!!!) 
+    so that what (b) shows below is fully realized.
+
+    # Find the parts to change! Don't DISTORT its content. (You must understand it first!!!)
+
+(b) 
+
+(VirEnv1) > chmod u+x ipynb2py.py
+(VirEnv1) > cp ipynb2py.py ~/bin/
+(VirEnv1) > ln ~/bin/ipynb2py.py ~/bin/ipynb2py    # so as to make it look more like a Linux command
+(VirEnv1) > ipynb2py                               # now run the new Linux command
+Please enter the directory-path under which the .ipynb files are located : /home/wang/Linux_Practice/LinuxClass/TestArea/251016
+Converting: /home/wang/Linux_Practice/LinuxClass/TestArea/251016/ipynb2py_original_01.ipynb
+Saved to: /home/wang/Linux_Practice/LinuxClass/TestArea/251016/converted_py/ipynb2py_original_01.py
+Converting: /home/wang/Linux_Practice/LinuxClass/TestArea/251016/py2ipynb_original_01.ipynb
+Saved to: /home/wang/Linux_Practice/LinuxClass/TestArea/251016/converted_py/py2ipynb_original_01.py
+
+(VirEnv1) > ls *      # there is a new sub-directory named 'converted_py'
+hardLkFile                  ipynb2py_original.py  py2ipynb_original_01.ipynb  targetFile
+ipynb2py_original_01.ipynb  ipynb2py.py           softLkFile                  temp
+
+converted_py:
+ipynb2py_original_01.py  py2ipynb_original_01.py
+
+(VirEnv1) > 
+
+---------------------------------------------------------------------------------------------
+
+                 Linux shell script 2 : a shellcode scanner (in Python/C++/bash-construct)
+
+--------------------------------------------------------------------------------------
+
+The original question (to Copilot) :
+
+  Please write a Python script that scans all .cpp files under a directory on Ubuntu-2204. 
+  The purpose of this Python script is to detect shell code. 
+
+# 註：有五行的Copilot output被我combine成一行(三個程式都是如此 —— 五行combine成一行)，此做法的正確性尚待商榷
+
+# 原五行 :
+    re.compile(r'char\s+\w+\s*
+
+\[\s*\]
+
+\s*=\s*".*\\x[0-9a-fA-F]{2}'),  # Byte arrays
+# END - 原五行
+
+Copilot :
+
+To write a Python script that scans .cpp files for potential shellcode on Ubuntu 22.04, you'll want to combine file system traversal with pattern matching. Here's a breakdown of how to approach it:
+
+1. Directory Traversal
+
+Use os.walk() or pathlib.Path.rglob() to recursively find all .cpp files.
+
+2. Shellcode Detection Heuristics
+
+Shellcode in C++ files often appears as:
+
+  Hex byte arrays (e.g. "\x90\x90\xeb\xfe")
+
+  Inline assembly (__asm__, asm)
+
+  Suspicious function calls (VirtualAlloc, memcpy, CreateThread, etc.)
+
+  Obfuscated strings or encoded payloads
+
+You can use regular expressions to detect these patterns.
+
+3. Reporting
+
+Log findings per file with line numbers and matched content.
+
+--------------------------- File content ---------------------
+import re
+from pathlib import Path
+
+# Define suspicious patterns
+SHELLCODE_PATTERNS = [
+    re.compile( r'\\x[0-9a-fA-F]{2}' ),  # Hex byte strings
+    re.compile( r'__asm__|asm' ),        # Inline assembly
+    re.compile( r'(VirtualAlloc|CreateThread|memcpy|LoadLibrary|GetProcAddress)' ),  
+                                                                       # Common shellcode APIs
+    re.compile( r'char\s+\w+\s*\[\s*\]\s*=\s*".*\\x[0-9a-fA-F]{2}' ),  # Byte arrays
+]
+
+def scan_cpp_files( directory: Path ) :
+  
+  for file_path in directory.rglob("*.cpp") :
+      try :
+        with file_path.open("r", encoding="utf-8", errors="ignore") as f :
+          for lineno, line in enumerate(f, start=1) :
+            for pattern in SHELLCODE_PATTERNS :
+              if pattern.search(line) :
+                 print( f"[!] Suspicious pattern in {file_path} at line {lineno}: {line.strip()}" )
+      except Exception as e :
+        print( f"[ERROR] Could not read {file_path}: {e}" )
+
+if __name__ == "__main__":
+  
+  import sys
+  
+  if len(sys.argv) != 2 :
+    print( "Usage: python detect_shellcode.py /path/to/scan" )
+    
+  else : # len( sys.argv ) == 2
+    scan_cpp_files( Path( sys.argv[1] ) )
+--------------------------- END - File content ---------------------
+
+Optional Enhancements
+
+  Dry-run mode: Preview files to be scanned
+  Summary report: Count of suspicious files and patterns
+  Logging: Save results to a file
+  CLI packaging: Use argparse for options like --verbose, --pattern, --output
+  Unit tests: Validate detection logic with sample .cpp files
+  Symlink detection: Skip or follow symlinks safely
+
+--------------------------------------------------------------------------------------
+
+                    A corresponding C or C++ version :
+
+--------------------------- File content ---------------------
+# include <iostream>
+# include <filesystem>
+# include <fstream>
+# include <regex>
+# include <string>
+
+namespace fs = std::filesystem ;
+
+const std::vector<std::regex> shellcode_patterns = {
+
+    std::regex( R"(\\x[0-9a-fA-F]{2})" ),                      // Hex byte strings
+    std::regex( R"(\b(__asm__|asm)\b)" ),                      // Inline assembly
+    std::regex( R"(\b(VirtualAlloc|CreateThread|memcpy|LoadLibrary|GetProcAddress)\b)" ), 
+                                                             // Common shellcode APIs
+    std::regex( R"(char\s+\w+\s*\[\s*\]\s*=\s*".*\\x[0-9a-fA-F]{2})" ) // Byte arrays
+} ;
+
+void scan_file(const fs::path& file_path) {
+  
+  std::ifstream file(file_path);
+  
+  if ( ! file.is_open() ) {
+    std::cerr << "[ERROR] Could not open: " << file_path << "\n";
+    return;
+  }
+  
+  std::string line ;
+  int lineno = 0 ;
+  while ( std::getline(file, line) ) {
+
+    ++lineno;
+
+    for ( const auto& pattern : shellcode_patterns ) {
+
+      if (std::regex_search(line, pattern)) {
+        std::cout << "[!] Suspicious pattern in " << file_path
+                  << " at line " << lineno << ": " << line << "\n";
+      }
+    }
+  }
+}
+
+void scan_directory(const fs::path& root) {
+  
+  if (!fs::exists(root) || !fs::is_directory(root)) {
+    std::cerr << "[ERROR] Invalid directory: " << root << "\n";
+    return;
+  }
+  
+  for (const auto& entry : fs::recursive_directory_iterator(root)) {
+    if (entry.is_regular_file() && entry.path().extension() == ".cpp") {
+      scan_file(entry.path());
+    }
+  }
+}
+
+int main(int argc, char* argv[]) {
+  
+  if (argc != 2) {
+    std::cerr << "Usage: ./detect_shellcode /path/to/scan\n";
+    return 1;
+  }
+  
+  fs::path target_dir(argv[1]);
+  scan_directory(target_dir);
+  return 0;
+}
+--------------------------- END - File content ---------------------
+
+🧰 Build Instructions (Ubuntu 22.04)
+
+g++ -std=c++17 -o detect_shellcode detect_shellcode.cpp
+./detect_shellcode /path/to/your/cpp/files
+
+✅ Optional Enhancements
+
+  Add command-line flags for verbosity or output file
+  Use std::set to track unique matches
+  Add summary statistics at the end
+  Integrate with libmagic or capstone for deeper binary analysis
+  Would you like help adding CLI flags or turning this into a more interactive tool?
+
+-------------------------------------------------------------------------------------
+
+               A corresponding bash Shellcode Scanner (Basic Version)
+
+Copilot : While Bash isn't ideal for deep parsing, it's great for quick pattern matching with tools like grep, find, and awk.
+
+--------------------------- File content ---------------------
+#!/bin/bash
+
+# Directory to scan
+TARGET_DIR="$1"
+
+# Check input
+if [[ -z "$TARGET_DIR" ]]; then
+  echo "Usage: $0 /path/to/scan"
+  exit 1
+fi
+
+# Define suspicious patterns
+PATTERNS=(
+  '\\x[0-9a-fA-F]{2}'                         # Hex byte strings
+  '__asm__|asm'                               # Inline assembly
+  'VirtualAlloc|CreateThread|memcpy|LoadLibrary|GetProcAddress'  # Common APIs
+  'char[[:space:]]+[a-zA-Z_][a-zA-Z0-9_]*[[:space:]]*\[[^]]*\][[:space:]]*=[[:space:]]*".*\\x[0-9a-fA-F]{2}' # Byte arrays
+)
+
+# Scan .cpp files recursively
+find "$TARGET_DIR" -type f -name "*.cpp" | while read -r file; do
+  for pattern in "${PATTERNS[@]}"; do
+    grep -En "$pattern" "$file" 2>/dev/null | while read -r match; do
+      echo "[!] Match in $file: $match"
+    done
+  done
+done
+--------------------------- END - File content ---------------------
+
+✅ How to Use
+
+chmod +x detect_shellcode.sh
+./detect_shellcode.sh /path/to/cpp/files
+
+Optional Enhancements
+  Add --summary or --verbose flags
+  Pipe results to a log file
+  Use awk to format output
+  Integrate with xargs for parallel scanning
+
+--------------------------- END - Linux-114-251016-ClassNotes.txt ---------------------------
+
+   
