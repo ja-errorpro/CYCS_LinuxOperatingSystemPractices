@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+
+import asyncio
+
+HOST = '127.0.0.1'  # DO : change this
+PORT = 65432        # was : 8888
+
+async def tcp_client( clientNo, timeToSleep ) :
+  
+  reader, writer = await asyncio.open_connection( HOST, PORT )  
+  
+  # Send first "Hello"
+  writer.write( ( "First hello from Client-" + str( clientNo ) ).encode() )
+  await writer.drain()
+  
+  response = await reader.read( 100 )
+  print( f"Response from server : { response.decode() }" )
+  
+  await asyncio.sleep( timeToSleep ) # sleep and yield control, wait to be resumed after waking up
+  
+  # Send second "Hello"
+  writer.write( ( "Second hello from Client-" + str( clientNo ) ).encode() )
+  await writer.drain()
+  
+  response = await reader.read( 100 )
+  print( f"Response from server : { response.decode() }" )
+  
+  # Communication ends here ; so, close the connection
+  writer.close()
+  await writer.wait_closed()
+  
+# tcp_client()
+
+# # Below is actually sequencing
+# asyncio.run( tcp_client( 1, 5) )
+# asyncio.run( tcp_client( 2, 3) )
+# asyncio.run( tcp_client( 3, 1) )
+
+async def main():
+  await asyncio.gather(
+    tcp_client( 1, 5),
+    tcp_client( 2, 7),
+    tcp_client( 3, 1),
+    tcp_client( 4, 10),
+    tcp_client( 5, 2),
+  ) # asyncio.gather()
+# main()
+
+asyncio.run( main() )

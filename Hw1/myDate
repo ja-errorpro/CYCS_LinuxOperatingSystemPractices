@@ -1,0 +1,4 @@
+echo "This is my date: "
+date
+echo "Hi"
+

@@ -1,0 +1,2 @@
+#!/usr/bin/env PrintPara
+echo this should not be printed

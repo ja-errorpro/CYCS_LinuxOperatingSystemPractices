@@ -1,0 +1,17 @@
+
+#!/usr/bin/env python3
+import asyncio
+
+async def task( name, delay ) :  # 'async' ; function name : task
+  print( f"{ name } started" )
+  await asyncio.sleep( delay )   # 'await'
+  print( f"{ name } finished" )
+
+async def main():                # 'async'
+  await asyncio.gather(          # 'await'
+    task( "A", 2 ), # print, start sleeping, relinquishes control, wake up, wait to be resumed
+    task( "B", 1 ), # print, start sleeping, relinquishes control, wake up, wait to be resumed
+    task( "C", 3 ), # print, start sleeping, relinquishes control, wake up, wait to be resumed
+  ) # asyncio.gather()
+
+asyncio.run( main() )

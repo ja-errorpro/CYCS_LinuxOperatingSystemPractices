@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+
+HOST = '0.0.0.0'  # allow any IP to connect ; To allow only localhost, use '127.0.0.1' or 'localhost'
+PORT = 65432      # was : 8888 in the example
+
+import asyncio  # async-IO
+
+async def handle_client( reader, writer ) :     # 'aync' announces to be governed by the event loop
+# Called when a connection has been established # only when 'async' is it meaningful to use 'await'
+# We now have both a reader and a writer to use ;
+# 'reader' is a StreamReader ; 'writer' is a StreamWriter
+  
+  addr = writer.get_extra_info( 'peername' )
+  print( f"Server now connected with { addr }" )
+  
+  while True : # as long as the connection is still there ...
+    
+    # await df= register, relinquish control, to be resumed (by the event loop) when condition satisfied
+    #                         100 : max num of bytes to read
+    data = await reader.read( 100 )  # <------ read() of reader is non-blocking
+    
+    if not data :     # read() was resumed by the event loop but did not get any data
+      break           # "read() called but no data" means client disconnect ; time to end
+    
+    # assert : read() did get some data
+    
+    message = data.decode()   # note : data is just a sequence of bytes ; have to "decode" to str
+    print( f"Message received from { addr } : { message }" )
+    
+    # send an echo response back to the client
+    
+    response = f"Server has received : { message }"
+    writer.write( response.encode() ) # write() and read() only work with bytes (= str1.encode())
+    await writer.drain()              # non-blocking flush
+    
+  # while the connection is alive
+  
+  # assert : there was an established connection at the start ; now, client has disconnected
+  
+  writer.close()  # alternatively, we could put these three lines right above 'break'
+  await writer.wait_closed()
+  print( f"writer-connection with { addr } now closed.\n" )
+  
+# handle_client()
+
+async def main() :  # 'aync' announces to be governed by the event loop
+                    # only when 'async' is it meaningful to use 'await'
+  
+  # handle_client() is to be used as a callback function ;
+  
+  # for each client that has succeeded in connecting with this server, asyncio.start_server() will spawn a coroutine (to handle the connection) by "calling back" the callback function 'handle_client' with two arguments - a StreamReader (the "client reader") and a StreamWriter (the "client writer").
+  
+  server = await asyncio.start_server( handle_client, HOST, PORT ) # create such a server object
+  
+  print( f"Server now starts to listen on port { PORT }\n" ) 
+  
+  async with server :
+    await server.serve_forever()
+  
+# main()
+
+asyncio.run( main() )
